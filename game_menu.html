@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <link rel="icon" type="image/png" href="favicon.png">
+    <title>Игры со смыслом · Информатика</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ----- RESET & BASE ----- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0f1a2b 0%, #1a2a40 100%);
+            font-family: 'Nunito', sans-serif;
+            min-height: 100vh;
+            color: #e8f0fc;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1100px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* ----- FLOATING EMOJIS (like main page) ----- */
+        .floating-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .float-item {
+            position: absolute;
+            font-size: 2.2rem;
+            opacity: 0.12;
+            animation: floatUp 18s infinite linear;
+            top: 110%;
+            left: var(--x);
+            animation-delay: var(--delay);
+        }
+
+        @keyframes floatUp {
+            0%   { transform: translateY(0) rotate(0deg) scale(1); opacity: 0.08; }
+            10%  { opacity: 0.18; }
+            90%  { opacity: 0.18; }
+            100% { transform: translateY(-110vh) rotate(720deg) scale(0.6); opacity: 0; }
+        }
+
+        /* ----- NAVBAR (matching main site) ----- */
+        .navbar {
+            background: rgba(15, 26, 43, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 60px;
+            padding: 12px 28px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .navbar .logo {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.5rem;
+            color: #f6c343;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+        }
+
+        .lang-switcher {
+            display: flex;
+            gap: 4px;
+            margin-left: 8px;
+        }
+
+        .lang-btn {
+            background: #1e3144;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #aac3dd;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid #2f4863;
+        }
+
+        .lang-btn.active {
+            background: #f6c343;
+            color: #0f1a2b;
+            border-color: #fad67a;
+        }
+
+        .lang-btn:hover {
+            background: #3d5775;
+            color: #fff;
+        }
+        .lang-btn.active:hover {
+            background: #fad05a;
+        }
+
+        /* ----- PAGE HEADER ----- */
+        .page-header {
+            text-align: center;
+            margin-bottom: 48px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .page-header .badge {
+            display: inline-block;
+            background: #f6c343;
+            color: #0f1a2b;
+            padding: 4px 20px;
+            border-radius: 40px;
+            font-weight: 800;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .page-header h1 {
+            font-family: 'Fredoka One', cursive;
+            font-size: 3rem;
+            color: #f0f6ff;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .page-header h1 .highlight {
+            color: #f6c343;
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            color: #aac3dd;
+            max-width: 600px;
+            margin: 8px auto 0;
+        }
+
+        /* ----- GAME GRID ----- */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            position: relative;
+            z-index: 2;
+            width: 100%;
+        }
+
+        .game-card {
+            background: rgba(20, 35, 55, 0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 40px;
+            padding: 32px 28px 28px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            transition: transform 0.25s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            color: #e8f0fc;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            min-height: 280px;
+        }
+
+        .game-card:hover {
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+            border-color: rgba(246, 195, 67, 0.25);
+        }
+
+        .game-card .card-bg-emoji {
+            position: absolute;
+            right: -10px;
+            bottom: -10px;
+            font-size: 8rem;
+            opacity: 0.07;
+            pointer-events: none;
+            transform: rotate(8deg);
+        }
+
+        .game-card .card-icon {
+            font-size: 3.5rem;
+            margin-bottom: 14px;
+            display: block;
+        }
+
+        .game-card h3 {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.6rem;
+            margin-bottom: 8px;
+            color: #f0f6ff;
+        }
+
+        .game-card p {
+            font-size: 1rem;
+            color: #b6cbe0;
+            line-height: 1.5;
+            flex: 1;
+        }
+
+        .game-card .tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .game-card .tag {
+            background: #1e3144;
+            padding: 4px 14px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #aac3dd;
+            border: 1px solid #2f4863;
+        }
+
+        .game-card .tag.highlight-tag {
+            background: #f6c343;
+            color: #0f1a2b;
+            border-color: #fad67a;
+        }
+
+        .game-card .play-btn {
+            margin-top: 20px;
+            background: #f6c343;
+            color: #0f1a2b;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 60px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+            box-shadow: 0 6px 0 #9f7d2b;
+            width: 100%;
+        }
+
+        .game-card .play-btn:hover {
+            background: #fdda5a;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 #9f7d2b;
+        }
+
+        .game-card .play-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 3px 0 #9f7d2b;
+        }
+
+        /* card variants */
+        .card-morse {
+            background: linear-gradient(135deg, rgba(20, 40, 70, 0.85), rgba(10, 25, 50, 0.9));
+        }
+        .card-morse .card-icon { color: #6fc3ff; }
+
+        .card-roman {
+            background: linear-gradient(135deg, rgba(50, 30, 60, 0.85), rgba(30, 15, 45, 0.9));
+        }
+        .card-roman .card-icon { color: #f6c343; }
+
+        /* ----- FOOTER ----- */
+        footer {
+            margin-top: 40px;
+            padding: 20px 0;
+            text-align: center;
+            color: #5a7897;
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            border-top: 1px solid rgba(255,255,255,0.04);
+        }
+
+        /* ----- RESPONSIVE ----- */
+        @media (max-width: 700px) {
+            .navbar {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 16px 20px;
+                border-radius: 32px;
+            }
+            .page-header h1 {
+                font-size: 2.2rem;
+            }
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+            .game-card {
+                min-height: 220px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar .logo {
+                font-size: 1.2rem;
+                text-align: center;
+            }
+            .lang-btn {
+                font-size: 0.6rem;
+                padding: 3px 7px;
+            }
+            .page-header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Floating emojis (matching main page) -->
+<div class="floating-bg">
+    <div class="float-item" style="--x: 5%; --delay: 0s;">💻</div>
+    <div class="float-item" style="--x: 15%; --delay: 2s;">🎮</div>
+    <div class="float-item" style="--x: 25%; --delay: 4s;">🧠</div>
+    <div class="float-item" style="--x: 35%; --delay: 1s;">🎯</div>
+    <div class="float-item" style="--x: 45%; --delay: 3s;">🚀</div>
+    <div class="float-item" style="--x: 55%; --delay: 5s;">⭐</div>
+    <div class="float-item" style="--x: 65%; --delay: 2.5s;">🔢</div>
+    <div class="float-item" style="--x: 75%; --delay: 0.5s;">🎲</div>
+    <div class="float-item" style="--x: 85%; --delay: 3.5s;">📡</div>
+    <div class="float-item" style="--x: 95%; --delay: 1.5s;">🏆</div>
+</div>
+
+<div class="container">
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="index.html" class="logo">🎓 Учи играючи !</a>
+        <div class="lang-switcher">
+            <button class="lang-btn active" data-lang="ru">🇷🇺 RU</button>
+            <button class="lang-btn" data-lang="en">🇬🇧 EN</button>
+            <button class="lang-btn" data-lang="de">🇩🇪 DE</button>
+            <button class="lang-btn" data-lang="es">🇪🇸 ES</button>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="badge">🎯 Интерактивное обучение</div>
+        <h1>Игры со <span class="highlight">смыслом</span></h1>
+        <p>Изучай информатику через игру — выбирай игру и начинай приключение!</p>
+    </div>
+
+    <!-- Games Grid -->
+    <div class="games-grid">
+
+        <!-- GAME 1: MORSE CODE -->
+        <a href="game/morze_en.html" class="game-card card-morse">
+            <div class="card-bg-emoji">📡</div>
+            <span class="card-icon">📡</span>
+            <h3>Азбука Морзе</h3>
+            <p>Изучай азбуку Морзе с интерактивными упражнениями. Переводи буквы, цифры и даже целые слова!</p>
+            <div class="tags">
+                <span class="tag highlight-tag">🎯 Тренажёр</span>
+                <span class="tag">🔤 Буквы</span>
+                <span class="tag">🔢 Цифры</span>
+            </div>
+            <div class="play-btn">▶ Играть</div>
+        </a>
+
+        <!-- GAME 2: ROMAN ARITHMETIC -->
+        <a href="game/rim_ch.html" class="game-card card-roman">
+            <div class="card-bg-emoji">🏛️</div>
+            <span class="card-icon">🏛️</span>
+            <h3>Римская арифметика</h3>
+            <p>Решай арифметические задачи с римскими цифрами. Тренируй сложение, вычитание, умножение и деление в увлекательной форме!</p>
+            <div class="tags">
+                <span class="tag highlight-tag">🧮 Математика</span>
+                <span class="tag">➕ − × ÷</span>
+                <span class="tag">🏛️ Римские</span>
+            </div>
+            <div class="play-btn">▶ Играть</div>
+        </a>
+
+        <!-- GAME 3: Ip_adres -->
+        <a href="game/network_address.html" class="game-card card-ip">
+            <div class="card-bg-emoji">🌐</div>
+            <span class="card-icon">🌐</span>
+            <h3>Адрес сети</h3>
+            <p>Определяй адрес сети по IP-адресу узла и маске подсети. Тренируй побитовую логику и понимание </p>
+            <div class="tags">
+                <span class="tag highlight-tag">🎯 Тренажёр</span>
+                <span class="tag">🌐 Сети</span>
+                <span class="tag">🧮 AND-логика</span>
+            </div>
+            <div class="play-btn">▶ Играть</div>
+        </a>
+          <!-- GAME 4: Number Systems -->
+        <a href="game/cc.html" class="game-card card-ip">
+            <div class="card-bg-emoji">🔢</div>
+            <span class="card-icon">🔢</span>
+            <h3>Взломай код любой системы!</h3>
+            <p>Научись свободно оперировать числами в любой системе счисления </p>
+            <div class="tags">
+                <span class="tag highlight-tag">🎯 Тренажёр</span>
+                <span class="tag">🌐 Сети</span>
+                <span class="tag">🧮 AND-логика</span>
+            </div>
+            <div class="play-btn">▶ Играть</div>
+        </a>
+
+        <!-- You can add more games here later -->
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div>© 2026 · Учебная платформа по информатике</div>
+        <div style="font-size:0.8rem; color:#4a6887; margin-top:4px;">Сделано с ❤️ для учеников</div>
+    </footer>
+
+</div>
+
+<script>
+    // ----- SIMPLE LANGUAGE SWITCHER (demo) -----
+    const langBtns = document.querySelectorAll('.lang-btn');
+    const texts = {
+        ru: {
+            logo: '🎓 Учи играючи',
+            badge: '🎯 Интерактивное обучение',
+            title: 'Игры со <span class="highlight">смыслом</span>',
+            subtitle: 'Изучай информатику через игру — выбирай игру и начинай приключение!',
+            morseTitle: 'Азбука Морзе',
+            morseDesc: 'Изучай азбуку Морзе с интерактивными упражнениями. Переводи буквы, цифры и даже целые слова!',
+            morseTag1: '🎯 Тренажёр',
+            morseTag2: '🔤 Буквы',
+            morseTag3: '🔢 Цифры',
+            romanTitle: 'Римская арифметика',
+            romanDesc: 'Решай арифметические задачи с римскими цифрами. Тренируй сложение, вычитание, умножение и деление в увлекательной форме!',
+            romanTag1: '🧮 Математика',
+            romanTag2: '➕ − × ÷',
+            romanTag3: '🏛️ Римские',
+            play: '▶ Играть',
+            footer: 'Учебная платформа по информатике',
+            footerLove: 'Сделано с ❤️ для учеников'
+        },
+        en: {
+            logo: '🎓 Learn by playing',
+            badge: '🎯 Interactive Learning',
+            title: 'Games with <span class="highlight">Meaning</span>',
+            subtitle: 'Learn Computer Science through play — pick a game and start your adventure!',
+            morseTitle: 'Morse Code',
+            morseDesc: 'Learn the Morse alphabet with interactive exercises. Translate letters, numbers, and even whole words!',
+            morseTag1: '🎯 Training',
+            morseTag2: '🔤 Letters',
+            morseTag3: '🔢 Numbers',
+            romanTitle: 'Roman Arithmetic',
+            romanDesc: 'Solve arithmetic problems with Roman numerals. Practice addition, subtraction, multiplication and division in a fun way!',
+            romanTag1: '🧮 Math',
+            romanTag2: '➕ − × ÷',
+            romanTag3: '🏛️ Roman',
+            play: '▶ Play Now',
+            footer: 'Computer Science Learning Platform',
+            footerLove: 'Made with ❤️ for students'
+        },
+        de: {
+            logo: '🎓 Lerne spielend',
+            badge: '🎯 Interaktives Lernen',
+            title: 'Spiele mit <span class="highlight">Sinn</span>',
+            subtitle: 'Lerne Informatik durch Spielen — wähle ein Spiel und starte dein Abenteuer!',
+            morseTitle: 'Morse-Code',
+            morseDesc: 'Lerne den Morse-Code mit interaktiven Übungen. Übersetze Buchstaben, Zahlen und sogar ganze Wörter!',
+            morseTag1: '🎯 Training',
+            morseTag2: '🔤 Buchstaben',
+            morseTag3: '🔢 Zahlen',
+            romanTitle: 'Römische Arithmetik',
+            romanDesc: 'Löse Rechenaufgaben mit römischen Ziffern. Übe Addition, Subtraktion, Multiplikation und Division!',
+            romanTag1: '🧮 Mathe',
+            romanTag2: '➕ − × ÷',
+            romanTag3: '🏛️ Römisch',
+            play: '▶ Spielen',
+            footer: 'Informatik-Lernplattform',
+            footerLove: 'Mit ❤️ für Schüler gemacht'
+        },
+        es: {
+            logo: '🎓 Aprende jugando',
+            badge: '🎯 Aprendizaje interactivo',
+            title: 'Juegos con <span class="highlight">Sentido</span>',
+            subtitle: 'Aprende informática jugando — elige un juego y comienza tu aventura!',
+            morseTitle: 'Código Morse',
+            morseDesc: 'Aprende el alfabeto Morse con ejercicios interactivos. Traduce letras, números e incluso palabras completas!',
+            morseTag1: '🎯 Entrenamiento',
+            morseTag2: '🔤 Letras',
+            morseTag3: '🔢 Números',
+            romanTitle: 'Aritmética Romana',
+            romanDesc: 'Resuelve problemas aritméticos con números romanos. Practica suma, resta, multiplicación y división!',
+            romanTag1: '🧮 Matemáticas',
+            romanTag2: '➕ − × ÷',
+            romanTag3: '🏛️ Romanos',
+            play: '▶ Jugar',
+            footer: 'Plataforma de aprendizaje de informática',
+            footerLove: 'Hecho con ❤️ para estudiantes'
+        }
+    };
+
+    let currentLang = 'ru';
+
+    function setLanguage(lang) {
+        currentLang = lang;
+        const t = texts[lang];
+
+        // Update active button
+        langBtns.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.lang === lang);
+        });
+
+        // Update logo
+        document.querySelector('.navbar .logo').innerHTML = t.logo;
+
+        // Update header
+        document.querySelector('.page-header .badge').textContent = t.badge;
+        document.querySelector('.page-header h1').innerHTML = t.title;
+        document.querySelector('.page-header p').textContent = t.subtitle;
+
+        // Update game cards
+        const cards = document.querySelectorAll('.game-card');
+        if (cards.length >= 2) {
+            // Morse
+            const morse = cards[0];
+            morse.querySelector('h3').textContent = t.morseTitle;
+            morse.querySelector('p').textContent = t.morseDesc;
+            const morseTags = morse.querySelectorAll('.tag');
+            if (morseTags.length >= 3) {
+                morseTags[0].textContent = t.morseTag1;
+                morseTags[1].textContent = t.morseTag2;
+                morseTags[2].textContent = t.morseTag3;
+            }
+            morse.querySelector('.play-btn').textContent = t.play;
+
+            // Roman
+            const roman = cards[1];
+            roman.querySelector('h3').textContent = t.romanTitle;
+            roman.querySelector('p').textContent = t.romanDesc;
+            const romanTags = roman.querySelectorAll('.tag');
+            if (romanTags.length >= 3) {
+                romanTags[0].textContent = t.romanTag1;
+                romanTags[1].textContent = t.romanTag2;
+                romanTags[2].textContent = t.romanTag3;
+            }
+            roman.querySelector('.play-btn').textContent = t.play;
+        }
+
+        // Footer
+        const footer = document.querySelector('footer');
+        if (footer) {
+            const lines = footer.querySelectorAll('div');
+            if (lines.length >= 2) {
+                lines[0].textContent = `© 2026 · ${t.footer}`;
+                lines[1].textContent = t.footerLove;
+            }
+        }
+    }
+
+    langBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            setLanguage(this.dataset.lang);
+        });
+    });
+
+    // Set initial language from URL param or default
+    const urlParams = new URLSearchParams(window.location.search);
+    const langParam = urlParams.get('lang');
+    if (langParam && texts[langParam]) {
+        setLanguage(langParam);
+    }
+</script>
+
+</body>
+</html>

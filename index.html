@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="favicon.png"> 
+    <title>Информатика — это весело!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Плавающие эмодзи -->
+<div class="floating-bg">
+    <div class="float-item" style="--x: 5%; --delay: 0s;">💻</div>
+    <div class="float-item" style="--x: 15%; --delay: 2s;">🎮</div>
+    <div class="float-item" style="--x: 25%; --delay: 4s;">🧠</div>
+    <div class="float-item" style="--x: 35%; --delay: 1s;">🎯</div>
+    <div class="float-item" style="--x: 45%; --delay: 3s;">🚀</div>
+    <div class="float-item" style="--x: 55%; --delay: 5s;">⭐</div>
+    <div class="float-item" style="--x: 65%; --delay: 2.5s;">🔢</div>
+    <div class="float-item" style="--x: 75%; --delay: 0.5s;">🎲</div>
+    <div class="float-item" style="--x: 85%; --delay: 3.5s;"></div>
+    <div class="float-item" style="--x: 95%; --delay: 1.5s;">🏆</div>
+</div>
+
+<div id="confetti-container"></div>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="container">
+        <a href="index.html" class="logo" data-i18n="logo">🎓 Учи играючи!</a>
+        <ul class="nav-menu">
+            <li><a href="#sections" class="active" data-i18n="nav_sections">Разделы</a></li>
+            <li><a href="#about" data-i18n="nav_about">О нас</a></li>
+            <li><a href="#stats" data-i18n="nav_stats">Статистика</a></li>
+            <li>
+                <div class="lang-switcher">
+                    <button class="lang-btn" data-lang="ru">🇷🇺 RU</button>
+                    <button class="lang-btn" data-lang="en">🇬🇧 EN</button>
+                    <button class="lang-btn" data-lang="de">🇩🇪 DE</button>
+                    <button class="lang-btn" data-lang="es">🇪🇸 ES</button>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-badge" data-i18n="hero_badge">🔥 Новинка 2026</div>
+        <h1 class="hero-title">
+            <span class="title-line" data-i18n="hero_title_1">Информатика</span>
+            <span class="title-line highlight" data-i18n="hero_title_2">это весело! 🎉</span>
+        </h1>
+        <p class="hero-subtitle" data-i18n="hero_subtitle">
+            Учись, играй, решай задачи и помогай друзьям — всё в одном месте!
+        </p>
+        <div class="hero-buttons">
+            <a href="#sections" class="btn btn-primary btn-bounce" data-i18n="hero_btn_start">🚀 Начать путешествие</a>
+            <a href="#about" class="btn btn-secondary" data-i18n="hero_btn_more">🤔 Узнать больше</a>
+        </div>
+        <div class="scroll-indicator">
+            <span data-i18n="scroll_down">Листай вниз</span>
+            <div class="arrow">↓</div>
+        </div>
+    </div>
+</section>
+
+<!-- Sections -->
+<section id="sections">
+    <div class="container">
+        <h2 class="section-title">
+            <span data-i18n="sections_title_1">Выбери свой путь</span>
+            <span class="emoji">️</span>
+        </h2>
+        <p class="section-subtitle" data-i18n="sections_subtitle">Четыре крутых направления для прокачки навыков</p>
+
+        <div class="cards-grid">
+            <!-- ПЕРВАЯ КАРТОЧКА: КУРС -->
+            <a href="pages/cc.html" class="fun-card card-course featured">
+                <div class="featured-badge" data-i18n="featured">⭐ Популярное</div>
+                <div class="card-emoji">📚</div>
+                <div class="card-content">
+                    <h3 data-i18n="card_course_title">Курс профильной информатики</h3>
+                    <p data-i18n="card_course_desc">Системы счисления, алгоритмы, логика — полный курс</p>
+                    <div class="card-tags">
+                        <span class="tag" data-i18n="card_course_tag1"> Системы счисления</span>
+                        <span class="tag" data-i18n="card_course_tag2">🧮 Калькулятор</span>
+                        <span class="tag" data-i18n="card_course_tag3">✏️ 60+ задач</span>
+                    </div>
+                </div>
+                <div class="card-arrow">→</div>
+            </a>
+
+            <a href="game_menu.html" class="fun-card card-games">
+                <div class="card-emoji">🎮</div>
+                <div class="card-content">
+                    <h3 data-i18n="card_games_title">Игры со смыслом</h3>
+                    <p data-i18n="card_games_desc">Учись играя! Интерактивные квесты, головоломки и мини-игры</p>
+                    <div class="card-tags">
+                        <span class="tag" data-i18n="card_games_tag1">🎲 Квесты</span>
+                        <span class="tag" data-i18n="card_games_tag2">🧩 Головоломки</span>
+                        <span class="tag" data-i18n="card_games_tag3">🏆 Рейтинги</span>
+                    </div>
+                </div>
+                <div class="card-arrow">→</div>
+            </a>
+
+            <a href="trein_menu.html" class="fun-card card-trainers">
+                <div class="card-emoji">💪</div>
+                <div class="card-content">
+                    <h3 data-i18n="card_trainers_title">Тренажёры</h3>
+                    <p data-i18n="card_trainers_desc">Повторяй, пока не запомнишь! Автогенерация заданий</p>
+                    <div class="card-tags">
+                        <span class="tag" data-i18n="card_trainers_tag1">🔄 Автогенерация</span>
+                        <span class="tag" data-i18n="card_trainers_tag2">✅ Проверка</span>
+                        <span class="tag" data-i18n="card_trainers_tag3">📈 Прогресс</span>
+                    </div>
+                </div>
+                <div class="card-arrow">→</div>
+            </a>
+
+            <a href="help.html" class="fun-card card-help">
+                <div class="card-emoji">🤝</div>
+                <div class="card-content">
+                    <h3 data-i18n="card_help_title">Помощь коллегам</h3>
+                    <p data-i18n="card_help_desc">Объясни другу то, что понял сам!</p>
+                    <div class="card-tags">
+                        <span class="tag" data-i18n="card_help_tag1">📝 Шпаргалки</span>
+                        <span class="tag" data-i18n="card_help_tag2">💡 Лайфхаки</span>
+                        <span class="tag" data-i18n="card_help_tag3">👥 Сообщество</span>
+                    </div>
+                </div>
+                <div class="card-arrow">→</div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Stats -->
+<section id="stats" class="stats-section">
+    <div class="container">
+        <h2 class="section-title">
+            <span data-i18n="stats_title">Наши достижения</span>
+            <span class="emoji">🏆</span>
+        </h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" data-target="12">0</div>
+                <div class="stat-label" data-i18n="stat_1">Тем курса</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" data-target="60">0</div>
+                <div class="stat-label" data-i18n="stat_2">Задач</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" data-target="1500">0</div>
+                <div class="stat-label" data-i18n="stat_3">Учеников</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" data-target="40">0</div>
+                <div class="stat-label" data-i18n="stat_4">Часа контента</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About -->
+<section id="about">
+    <div class="container">
+        <h2 class="section-title">
+            <span data-i18n="why_title">Почему это круто?</span>
+            <span class="emoji">💡</span>
+        </h2>
+        <div class="features-grid">
+            <div class="feature">
+                <div class="feature-icon">🎯</div>
+                <h4 data-i18n="feat_1_title">Интерактивность</h4>
+                <p data-i18n="feat_1_desc">Никакой скуки! Всё можно потрогать и проверить</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🧠</div>
+                <h4 data-i18n="feat_2_title">Понимание</h4>
+                <p data-i18n="feat_2_desc">Объясняем так, чтобы стало понятно</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🚀</div>
+                <h4 data-i18n="feat_3_title">От простого к сложному</h4>
+                <p data-i18n="feat_3_desc">Постепенное погружение без стресса</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🎨</div>
+                <h4 data-i18n="feat_4_title">Красивый дизайн</h4>
+                <p data-i18n="feat_4_desc">Учиться приятно для глаз</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-box">
+            <h2 data-i18n="cta_title">Готов начать? 🚀</h2>
+            <p data-i18n="cta_desc">Выбери раздел и погрузись в мир информатики!</p>
+            <a href="#sections" class="btn" data-i18n="cta_btn">🎯 Выбрать направление</a>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="footer-logo" data-i18n="logo">🎓 Учи играючи!</div>
+        <div>© 2026 <span data-i18n="footer_platform">Учебная платформа по информатике</span></div>
+        <div class="footer-tagline" data-i18n="footer_made">Сделано с ❤️ для учеников</div>
+    </div>
+</footer>
+
+<script src="translations.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

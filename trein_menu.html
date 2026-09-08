@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажёры | УчиИграючи!</title>
+    <!-- Подключаем ваши стили, если они есть, иначе будут работать встроенные ниже -->
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Дополнительные стили для страницы тренажеров, чтобы она соответствовала стилю index */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #c44dff 0%, #ff6b9d 100%);
+            --secondary-gradient: linear-gradient(135deg, #4d79ff 0%, #00d4ff 100%);
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-main: #2d3436;
+            --text-secondary: #636e72;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* Навигация */
+        header {
+            background: white;
+            padding: 1rem 5%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-main);
+            margin-left: 2rem;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #c44dff;
+        }
+
+        /* Герой-секция */
+        .hero-section {
+            text-align: center;
+            padding: 4rem 1rem;
+            background: radial-gradient(circle at top right, rgba(196, 77, 255, 0.1), transparent 40%),
+                        radial-gradient(circle at bottom left, rgba(255, 107, 157, 0.1), transparent 40%);
+        }
+
+        .hero-section h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero-section p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Сетка тренажеров */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .trainers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
+            margin-top: 2rem;
+        }
+
+        /* Карточка тренажера (использует класс fun-card для JS эффектов) */
+        .fun-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            transition: transform 0.1s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            border: 1px solid rgba(0,0,0,0.02);
+        }
+
+        .fun-card:hover {
+            box-shadow: 0 20px 40px rgba(196, 77, 255, 0.15);
+        }
+
+        .card-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            background: #f0f2f5;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .card-desc {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        /* Кнопки */
+        .btn-primary {
+            display: inline-block;
+            padding: 0.8rem 2.5rem;
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s, filter 0.2s;
+            border: none;
+            cursor: pointer;
+            margin-top: auto;
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.1);
+            transform: scale(1.05);
+        }
+
+        .btn-secondary {
+            background: var(--secondary-gradient);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+            color: var(--text-secondary);
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Контейнер для конфетти из main.js -->
+    <div id="confetti-container"></div>
+
+    <header>
+        <a href="index.html" class="logo">💻 УчиИграючи!</a>
+        <nav>
+            <a href="index.html">Главная</a>
+            <a href="trein_menu.html" style="color: #c44dff;">Тренажёры</a>
+            <a href="index.html#about">О нас</a>
+        </nav>
+    </header>
+
+    <section class="hero-section">
+        <h1>🎯 Прокачай навыки</h1>
+        <p>Выбирай направление и тренируйся в игровой форме. Быстрая печать и знание координат — это просто!</p>
+    </section>
+
+    <div class="container">
+        <div class="trainers-grid">
+            
+            <!-- Тренажер клавиатуры -->
+            <div class="fun-card">
+                <div class="card-icon">⌨️</div>
+                <h3 class="card-title">Клавиатурный бой</h3>
+                <p class="card-desc">Научись печатать быстро и без ошибок. ASCII-арт задания, веселые уровни и проверка точности.</p>
+                <a href="trein/kl_train_2_0.html" class="btn-primary">Начать тренировку</a>
+            </div>
+
+            <!-- Тренажер координат -->
+            <div class="fun-card">
+                <div class="card-icon">📍</div>
+                <h3 class="card-title">Весёлые Координаты</h3>
+                <p class="card-desc">Изучи декартову систему координат. Находи точки на плоскости, определяй положение объектов и зарабатывай звезды.</p>
+                <a href="trein/coord.html" class="btn-primary ">Играть</a>
+            </div>
+
+            <!-- Тренажер логических выражений -->
+            <div class="fun-card" style="opacity: 0.8;">
+                <div class="card-icon">🧩</div>
+                <h3 class="card-title">Логика и Алгоритмы</h3>
+                <p class="card-desc">Логика</p>
+                <a href="https://inffeja-sc.github.io/hlam/" class="btn-primary ">Думать</a>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 УчиИграючи!. Сделано с ❤️ для учеников.</p>
+    </footer>
+
+    <!-- Подключаем ваш основной скрипт для работы эффектов -->
+    <script src="main.js"></script>
+</body>
+</html>
