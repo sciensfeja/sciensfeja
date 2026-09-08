@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASCII Art Typing Trainer</title>
+    <style>
+        :root {
+            --bg-color: #eef2f6;
+            --key-bg: #ffffff;
+            --key-shadow: #c4c9d2;
+            --text-main: #2c3e50;
+            
+            /* Цвета состояний */
+            --color-active: #ffd700;   /* Желтый - основная клавиша */
+            --color-combo: #ff9800;    /* Оранжевый - ТОЛЬКО левый Shift */
+            --color-correct: #4caf50;  /* Зеленый - пройдено */
+            --color-current: #2196f3;  /* Синий - курсор */
+            --color-error: #f44336;    /* Красный - ошибка */
+            --color-success: #00bcd4;  /* Бирюзовый - успех */
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            color: var(--text-main);
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+            text-align: center;
+            max-width: 1100px;
+            width: 95%;
+        }
+
+        h1 { margin-top: 0; font-size: 22px; color: #546e7a; }
+
+        /* Область картинки и эмодзи */
+        .art-container {
+            background: #fafbfc;
+            border: 2px solid #eceff1;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+            transition: border-color 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Большой эмодзи-подсказка */
+        .emoji-hint {
+            font-size: 64px;
+            line-height: 1;
+            margin-bottom: 5px;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .emoji-hint.pop {
+            transform: scale(1.2);
+        }
+
+        .art-display {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 32px;
+            line-height: 1.5;
+            white-space: pre;
+            display: inline-block;
+            text-align: left;
+        }
+
+        /* Стили символов */
+        .char-done { color: var(--color-correct); opacity: 0.6; }
+        .char-active { 
+            color: var(--color-current); 
+            font-weight: bold;
+            background: rgba(33, 150, 243, 0.1);
+            border-radius: 4px;
+            box-shadow: 0 0 0 2px var(--color-current);
+        }
+        .char-wait { color: #b0bec5; }
+        
+        /* Клавиатура */
+        .keyboard {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            user-select: none;
+            background: #dce1e8;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .row { display: flex; justify-content: center; gap: 6px; }
+
+        .key {
+            width: 50px;
+            height: 55px;
+            background: var(--key-bg);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #455a64;
+            box-shadow: 0 4px 0 var(--key-shadow);
+            transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            top: 0;
+            line-height: 1;
+            padding: 2px 0;
+        }
+
+        /* Общие стили для частей клавиши */
+        .key-part {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .key-top { font-size: 11px; color: #90a4ae; height: 14px; font-weight: normal; }
+        .key-bottom { font-size: 18px; height: 26px; }
+
+        .key.wide { width: 80px; font-size: 13px; }
+        .key.space { width: 320px; }
+        .key.shift { width: 115px; }
+
+        /* Подсветка */
+        .key.active {
+            background-color: var(--color-active);
+            color: #333;
+            transform: translateY(4px);
+            box-shadow: 0 0 0 var(--key-shadow);
+            z-index: 10;
+        }
+        .key.active .key-top { color: #555; }
+
+        .key.combo {
+            background-color: var(--color-combo);
+            color: white;
+            transform: translateY(4px);
+            box-shadow: 0 0 0 var(--key-shadow);
+            z-index: 10;
+        }
+        .key.combo .key-top { color: rgba(255,255,255,0.9); }
+
+        .key.pressed {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 var(--key-shadow);
+            background-color: #cfd8dc;
+        }
+
+        /* Управление */
+        .controls {
+            margin-top: 25px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            background-color: var(--color-current);
+            color: white;
+            transition: transform 0.1s, background 0.2s;
+        }
+
+        button:hover { background-color: #1976d2; transform: translateY(-2px); }
+        button.secondary { background-color: #90a4ae; }
+        button.secondary:hover { background-color: #78909c; }
+
+        .level-info {
+            font-size: 14px;
+            color: #78909c;
+            margin-bottom: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Модальное окно */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            backdrop-filter: blur(3px);
+        }
+        .modal-overlay.show { opacity: 1; pointer-events: all; }
+        
+        .modal {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .modal-overlay.show .modal { transform: scale(1); }
+        .modal h2 { color: var(--color-success); margin-top: 0; font-size: 28px; }
+        .modal p { color: #546e7a; margin-bottom: 25px; font-size: 18px; }
+        .modal button { background-color: var(--color-success); width: 100%; }
+        .modal button:hover { background-color: #00acc1; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="level-info" id="levelName">Уровень 1: Улыбка</div>
+    
+    <div class="art-container">
+        <!-- Сюда будет вставляться большой эмодзи -->
+        <div class="emoji-hint" id="emojiHint"></div>
+        <div class="art-display" id="display"></div>
+    </div>
+
+    <div class="keyboard" id="keyboard"></div>
+
+    <div class="controls">
+        <button class="secondary" onclick="resetLevel()">Сброс уровня</button>
+    </div>
+</div>
+
+<!-- Модальное окно успеха -->
+<div class="modal-overlay" id="successModal">
+    <div class="modal">
+        <h2>🎉 Отлично!</h2>
+        <p id="modalText">Смайлик набран верно!</p>
+        <button onclick="closeModalAndNext()">Следующий уровень ▶</button>
+    </div>
+</div>
+
+<script>
+    // Уровни со смайликами и их визуальными эмодзи-аналогами
+    const levels = [
+        { name: "Улыбка", art: ":)", emoji: "🙂" },
+        { name: "Широкая улыбка", art: ":D", emoji: "😃" },
+        { name: "Подмигивание", art: ";)", emoji: "😉" },
+        { name: "Язык", art: ":P", emoji: "😛" },
+        { name: "Смех", art: "XD", emoji: "😆" },
+        { name: "Грусть", art: ":(", emoji: "🙁" },
+        { name: "Плач", art: ":'(", emoji: "😢" },
+        { name: "Сомнение", art: ":/", emoji: "😕" },
+        { name: "Удивление", art: ":O", emoji: "😮" },
+        { name: "Шок", art: "O_O", emoji: "😳" },
+        { name: "Сердце", art: "<3", emoji: "❤️" },
+        { name: "Радость", art: "^_^", emoji: "😊" },
+        { name: "Плач (японский)", art: "T_T", emoji: "😭" },
+        { name: "Головокружение", art: "@_@", emoji: "😵‍💫" },
+        { name: "Улыбка (полная)", art: ":-)", emoji: "🙂" },
+        { name: "Грусть (полная)", art: ":-(", emoji: "🙁" },
+        { name: "Поцелуй", art: ":*", emoji: "😘" },
+        { name: "Крутой", art: "8-)", emoji: "😎" },
+        { name: "Злость", art: ">:((", emoji: "😡" },
+        { name: "Обнимашки", art: "(o^ ^o)", emoji: "🤗" }
+    ];
+
+    let currentLevelIdx = 0;
+    let currentText = "";
+    let charIndex = 0;
+    let isFinished = false;
+
+    // Карта соответствия символов клавишам
+    const keyMap = {
+        '\n': 'enter', ' ': 'space',
+        '(': '(', ')': ')', '[': '[', ']': ']',
+        '<': '<', '>': '>', '\\': '\\', '/': '/',
+        '_': '_', '-': '-', '=': '=', '+': '+',
+        "'": "'", '"': '"', ';': ';', ':': ':',
+        ',': ',', '.': '.', '?': '?', '!': '!',
+        '@': '@', '#': '#', '$': '$', '%': '%',
+        '^': '^', '&': '&', '*': '*', '~': '~',
+        '`': '`', '|': '|', '№': '№'
+    };
+
+    // РАСКЛАДКА: ['верхний_знак', 'нижний_знак']
+    const layout = [
+        [['!', '1'], ['"', '@'], ['№', '#'], ['$', ';'], ['%', '5'], [':', '^'], ['?', '&'], ['*', '8'], ['(', '9'], [')', '0'], ['_', '-'], ['+', '='], 'Backspace'],
+        ['Tab', ['q', 'й'], ['w', 'ц'], ['e', 'у'], ['r', 'к'], ['t', 'е'], ['y', 'н'], ['u', 'г'], ['i', 'ш'], ['o', 'щ'], ['p', 'з'], ['[', 'х'], [']', 'ъ'], ['\\', 'э']],
+        ['CapsLock', ['a', 'ф'], ['s', 'ы'], ['d', 'в'], ['f', 'а'], ['g', 'п'], ['h', 'р'], ['j', 'о'], ['k', 'л'], ['l', 'д'], [';', 'ж'], ["'", 'э'], 'Enter'],
+        ['Shift', ['z', 'я'], ['x', 'ч'], ['c', 'с'], ['v', 'м'], ['b', 'и'], ['n', 'т'], ['m', 'ь'], ['<', ','], ['>', '.'], ['/', '?'], 'Shift'],
+        ['Space']
+    ];
+
+    function initKeyboard() {
+        const kb = document.getElementById('keyboard');
+        kb.innerHTML = '';
+        
+        layout.forEach(rowKeys => {
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'row';
+            
+            rowKeys.forEach(kData => {
+                const keyDiv = document.createElement('div');
+                keyDiv.className = 'key';
+                
+                let mainChar, dataKey;
+                
+                if (Array.isArray(kData)) {
+                    const topSign = kData[0];
+                    mainChar = kData[1];
+                    dataKey = mainChar.toLowerCase();
+                    
+                    keyDiv.innerHTML = `
+                        <span class="key-part key-top">${topSign}</span>
+                        <span class="key-part key-bottom">${mainChar}</span>
+                    `;
+                } else {
+                    mainChar = kData;
+                    dataKey = kData.toLowerCase();
+                    keyDiv.textContent = kData;
+                }
+
+                if(mainChar === 'Space') dataKey = 'space';
+                if(mainChar === 'Enter') dataKey = 'enter';
+                if(mainChar === 'Backspace') dataKey = 'backspace';
+                if(mainChar === 'Tab') dataKey = 'tab';
+                if(mainChar === 'CapsLock') dataKey = 'capslock';
+                if(mainChar === 'Shift') dataKey = 'shift';
+                
+                keyDiv.dataset.key = dataKey;
+
+                if(['Backspace','Tab','CapsLock','Enter'].includes(mainChar)) keyDiv.classList.add('wide');
+                if(mainChar === 'Shift') keyDiv.classList.add('shift');
+                if(mainChar === 'Space') keyDiv.classList.add('space');
+                
+                rowDiv.appendChild(keyDiv);
+            });
+            kb.appendChild(rowDiv);
+        });
+    }
+
+    function renderDisplay() {
+        const disp = document.getElementById('display');
+        disp.innerHTML = '';
+        
+        const chars = currentText.split('');
+        
+        chars.forEach((char, i) => {
+            const span = document.createElement('span');
+            span.textContent = (char === '\n') ? '↵\n' : char;
+            
+            if (i < charIndex) span.className = 'char-done';
+            else if (i === charIndex && !isFinished) span.className = 'char-active';
+            else span.className = 'char-wait';
+            
+            disp.appendChild(span);
+        });
+
+        highlightKeys();
+    }
+
+    function highlightKeys() {
+        document.querySelectorAll('.key').forEach(k => {
+            k.classList.remove('active', 'combo');
+        });
+
+        if (isFinished || charIndex >= currentText.length) return;
+
+        const targetChar = currentText[charIndex];
+        const needsShift = isUpperOrSpecial(targetChar);
+        
+        let baseKey = null;
+        
+        if (targetChar === '\n') baseKey = 'enter';
+        else if (targetChar === ' ') baseKey = 'space';
+        else {
+            const allKeys = document.querySelectorAll('.key');
+            for (let k of allKeys) {
+                const top = k.querySelector('.key-top')?.textContent || '';
+                const bottom = k.querySelector('.key-bottom')?.textContent || '';
+                
+                if (top === targetChar || bottom === targetChar || 
+                    top.toLowerCase() === targetChar.toLowerCase() || 
+                    bottom.toLowerCase() === targetChar.toLowerCase()) {
+                    baseKey = k.dataset.key;
+                    break;
+                }
+            }
+        }
+
+        const allKeys = document.querySelectorAll('.key');
+        
+        if (needsShift) {
+            const leftShift = Array.from(allKeys).find(k => 
+                k.dataset.key === 'shift' && 
+                k.getBoundingClientRect().left < window.innerWidth / 2
+            );
+            if (leftShift) leftShift.classList.add('combo');
+        }
+
+        if (baseKey) {
+            allKeys.forEach(k => {
+                if (k.dataset.key === baseKey) {
+                    k.classList.add('active');
+                }
+            });
+        }
+    }
+
+    function isUpperOrSpecial(char) {
+        if (char >= 'A' && char <= 'Z') return true;
+        const shiftChars = '!@#$%^&*()_+{}|:"<>?~№';
+        return shiftChars.includes(char);
+    }
+
+    function handleInput(e) {
+        if (isFinished) return;
+        if (e.key.length > 1 && e.key !== 'Enter') return;
+
+        animateKeyVisual(e.key);
+
+        const expected = currentText[charIndex];
+        
+        if (e.key === expected) {
+            charIndex++;
+            renderDisplay();
+            
+            if (charIndex >= currentText.length) {
+                finishLevel();
+            }
+        } else {
+            triggerError();
+        }
+    }
+
+    function animateKeyVisual(key) {
+        let val = key.toLowerCase();
+        if (key === 'Enter') val = 'enter';
+        if (key === ' ') val = 'space';
+        
+        document.querySelectorAll('.key').forEach(k => {
+            if (k.dataset.key === val || (k.textContent.toLowerCase() === val && val.length === 1)) {
+                k.classList.add('pressed');
+                setTimeout(() => k.classList.remove('pressed'), 150);
+            }
+        });
+    }
+
+    function triggerError() {
+        const container = document.querySelector('.art-container');
+        container.style.borderColor = 'var(--color-error)';
+        setTimeout(() => container.style.borderColor = '#eceff1', 300);
+    }
+
+    function finishLevel() {
+        isFinished = true;
+        document.querySelectorAll('.key').forEach(k => k.classList.remove('active', 'combo'));
+        
+        const activeSpans = document.querySelectorAll('.char-active');
+        activeSpans.forEach(s => s.className = 'char-done');
+
+        // Анимация эмодзи при завершении
+        const emojiEl = document.getElementById('emojiHint');
+        emojiEl.classList.add('pop');
+        setTimeout(() => emojiEl.classList.remove('pop'), 300);
+
+        showModal();
+    }
+
+    function showModal() {
+        const modal = document.getElementById('successModal');
+        const text = document.getElementById('modalText');
+        
+        if (currentLevelIdx < levels.length - 1) {
+            text.textContent = `Вы успешно набрали "${levels[currentLevelIdx].name}"!`;
+        } else {
+            text.textContent = "Поздравляем! Вы прошли ВСЕ уровни тренажера!";
+        }
+        
+        modal.classList.add('show');
+    }
+
+    function closeModalAndNext() {
+        const modal = document.getElementById('successModal');
+        modal.classList.remove('show');
+        
+        if (currentLevelIdx < levels.length - 1) {
+            loadLevel(currentLevelIdx + 1);
+        } else {
+            loadLevel(0);
+        }
+    }
+
+    function loadLevel(idx) {
+        currentLevelIdx = idx;
+        currentText = levels[idx].art;
+        charIndex = 0;
+        isFinished = false;
+        
+        document.getElementById('levelName').textContent = `Уровень ${idx + 1}: ${levels[idx].name}`;
+        
+        // Обновляем эмодзи-подсказку
+        document.getElementById('emojiHint').textContent = levels[idx].emoji;
+        
+        renderDisplay();
+    }
+
+    function resetLevel() {
+        loadLevel(currentLevelIdx);
+    }
+
+    // Запуск
+    window.addEventListener('keydown', handleInput);
+    initKeyboard();
+    loadLevel(0);
+
+</script>
+</body>
+</html>
