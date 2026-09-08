@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер Регулярных Выражений</title>
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --btn-check-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --btn-show-bg: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --btn-next-bg: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --btn-help-bg: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --border-radius: 12px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            color: var(--text-color);
+        }
+
+        .container {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 600px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            padding: 30px;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        h1 { text-align: center; font-size: 1.5rem; margin-bottom: 25px; color: #4a4a4a; }
+
+        /* Controls */
+        .controls {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .control-group { display: flex; flex-direction: column; gap: 5px; flex-grow: 1; margin-right: 15px; }
+        label { font-weight: bold; font-size: 0.9rem; color: #555; }
+        select { padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem; outline: none; width: 100%; }
+
+        /* Task Card */
+        .task-card {
+            background: #eef2ff;
+            border-left: 5px solid #667eea;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .task-title { font-weight: bold; color: #667eea; margin-bottom: 10px; display: block; }
+        .task-desc { font-size: 1.1rem; margin-bottom: 15px; }
+        .example-box {
+            background: #fff; border: 1px solid #d1d9e6; padding: 10px; border-radius: 6px;
+            font-family: 'Courier New', Courier, monospace; color: #555;
+        }
+
+        /* Input Area */
+        .input-area { margin-bottom: 20px; }
+        .regex-input {
+            width: 100%; padding: 12px; font-size: 1.1rem; border: 2px solid #ddd;
+            border-radius: 8px; box-sizing: border-box; font-family: 'Courier New', Courier, monospace;
+            transition: border-color 0.3s;
+        }
+        .regex-input:focus { border-color: #667eea; outline: none; }
+
+        /* Buttons */
+        .buttons-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+        button {
+            border: none; padding: 12px 5px; border-radius: 8px; color: white; font-weight: bold;
+            cursor: pointer; transition: transform 0.1s, opacity 0.2s; font-size: 0.9rem;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2;
+        }
+        button:active { transform: scale(0.98); }
+        button:hover { opacity: 0.9; }
+        .btn-check { background: var(--btn-check-bg); }
+        .btn-show { background: var(--btn-show-bg); }
+        .btn-next { background: var(--btn-next-bg); }
+        .btn-help { background: var(--btn-help-bg); }
+        .icon { font-size: 1.2rem; margin-bottom: 5px; }
+
+        /* Feedback & Stats */
+        .feedback { text-align: center; margin-bottom: 20px; min-height: 24px; font-weight: bold; }
+        .feedback.success { color: #2ecc71; }
+        .feedback.error { color: #e74c3c; }
+        .stats { display: flex; justify-content: space-around; border-top: 1px solid #eee; padding-top: 15px; font-size: 0.9rem; color: #666; }
+        .stat-item span { font-weight: bold; color: #333; }
+
+        /* Answer Reveal */
+        .answer-reveal {
+            display: none; background: #fff3cd; border: 1px solid #ffeeba; color: #856404;
+            padding: 10px; border-radius: 6px; margin-bottom: 15px; text-align: center; font-family: monospace;
+        }
+
+        /* Modal / Reference Guide */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 500px;
+            max-height: 80vh; overflow-y: auto; position: relative;
+        }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: #666; }
+        .ref-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .ref-table th, .ref-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .ref-table th { background-color: #f2f2f2; color: #333; }
+        .ref-table code { background: #eef2ff; padding: 2px 5px; border-radius: 4px; color: #667eea; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Научитесь составлять регулярные выражения</h1>
+
+    <div class="controls">
+        <div class="control-group">
+            <label for="difficulty">Сложность:</label>
+            <select id="difficulty" onchange="resetGame()">
+                <option value="easy">Легко (базовые паттерны)</option>
+                <option value="medium">Средне (группы и квантификаторы)</option>
+                <option value="hard">Сложно (lookahead, сложные структуры)</option>
+            </select>
+        </div>
+        <button class="btn-help" onclick="toggleModal()" style="margin-top: 20px; width: auto; padding: 10px 15px;">
+            <span class="icon">?</span> Справка
+        </button>
+    </div>
+
+    <div class="task-card">
+        <span class="task-title">Задание:</span>
+        <div class="task-desc" id="task-text">Загрузка задания...</div>
+        <div class="example-box" id="task-example">Пример: ...</div>
+    </div>
+
+    <div class="input-area">
+        <label style="display:block; margin-bottom:5px;">Ваше регулярное выражение:</label>
+        <input type="text" id="user-input" class="regex-input" placeholder="/pattern/flags" autocomplete="off">
+    </div>
+
+    <div id="answer-box" class="answer-reveal"></div>
+
+    <div class="buttons-row">
+        <button class="btn-check" onclick="checkAnswer()">
+            <span class="icon">✓</span> Проверить
+        </button>
+        <button class="btn-show" onclick="showAnswer()">
+            <span class="icon"></span> Ответ
+        </button>
+        <button class="btn-next" onclick="nextTask()">
+            <span class="icon">→</span> Дальше
+        </button>
+    </div>
+
+    <div class="feedback" id="feedback-msg"></div>
+    <div class="stats">
+        <div class="stat-item">✅ Верно: <span id="score-correct">0</span></div>
+        <div class="stat-item">❌ Ошибки: <span id="score-wrong">0</span></div>
+        <div class="stat-item"> Всего: <span id="score-total">0</span></div>
+    </div>
+</div>
+
+<!-- Модальное окно справочника -->
+<div id="help-modal" class="modal-overlay" onclick="if(event.target === this) toggleModal()">
+    <div class="modal-content">
+        <span class="close-modal" onclick="toggleModal()">&times;</span>
+        <h2 style="margin-top:0; color:#667eea;">Справочник Regex</h2>
+        <table class="ref-table">
+            <thead><tr><th>Символ</th><th>Описание</th><th>Пример</th></tr></thead>
+            <tbody>
+                <tr><td><code>.</code></td><td>Любой символ</td><td>a.b → axb</td></tr>
+                <tr><td><code>\d</code></td><td>Цифра (0-9)</td><td>\d\d → 12</td></tr>
+                <tr><td><code>\w</code></td><td>Буква, цифра, _</td><td>\w+ → hello</td></tr>
+                <tr><td><code>\s</code></td><td>Пробел, таб, перенос</td><td>a\sb → a b</td></tr>
+                <tr><td><code>^</code></td><td>Начало строки</td><td>^Hi</td></tr>
+                <tr><td><code>$</code></td><td>Конец строки</td><td>End$</td></tr>
+                <tr><td><code>*</code></td><td>0 или более раз</td><td>ab*c → ac, abc</td></tr>
+                <tr><td><code>+</code></td><td>1 или более раз</td><td>ab+c → abc</td></tr>
+                <tr><td><code>?</code></td><td>0 или 1 раз</td><td>colou?r → color</td></tr>
+                <tr><td><code>{n}</code></td><td>Ровно n раз</td><td>\d{3}</td></tr>
+                <tr><td><code>[abc]</code></td><td>Один из символов</td><td>[ae]</td></tr>
+                <tr><td><code>(...)</code></td><td>Группа захвата</td><td>(ab)+</td></tr>
+                <tr><td><code>\</code></td><td>Экранирование</td><td>\. → точка</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // База данных заданий с поддержкой нескольких вариантов ответа
+    const tasks = {
+        easy: [
+            { desc: "Найдите все цифры в тексте", example: "Цена: 100 руб, вес 5 кг", regex: ["\\d"], hint: "Используйте shorthand класс для цифр" },
+            { desc: "Найдите слово 'кот' (точно)", example: "кот сидит на коврике", regex: ["кот"], hint: "Просто напишите слово" },
+            { desc: "Найдите любой одиночный символ", example: "a.b", regex: ["."], hint: "Точка совпадает с любым символом" },
+            { desc: "Найдите начало строки", example: "Start here", regex: ["^"], hint: "Спецсимвол начала строки" },
+            { desc: "Найдите конец строки", example: "End here", regex: ["$"], hint: "Спецсимвол конца строки" },
+            { desc: "Найдите пробельный символ", example: "Hello World", regex: ["\\s"], hint: "Shorthand для whitespace" },
+            { desc: "Найдите букву 'a' или 'b'", example: "apple banana", regex: ["[ab]"], hint: "Используйте квадратные скобки" }
+        ],
+        medium: [
+            { desc: "Найдите email адрес (упрощенно)", example: "user@example.com", regex: [".+@.+\\..+"], hint: "Точка должна быть экранирована \\." },
+            { 
+                desc: "Найдите время в формате HH:MM", 
+                example: "14:30", 
+                regex: ["\\d{2}:\\d{2}", "[012]\\d:[012345]\\d", "([01]\\d|2[0-3]):[0-5]\\d"], 
+                hint: "Можно использовать \\d{2} или ограничить диапазоны [0-2][0-9]:[0-5][0-9]" 
+            },
+            { desc: "Найдите HTML тег (открывающий)", example: "<div>", regex: ["<[a-z]+>"], hint: "Класс символов [a-z] и плюс +" },
+            { desc: "Найдите дату в формате DD-MM-YYYY", example: "25-12-2023", regex: ["\\d{2}-\\d{2}-\\d{4}"], hint: "Используйте квантификатор {n}" },
+            { desc: "Найдите слова с заглавной буквы", example: "Hello World", regex: ["\\b[A-Z][a-z]*"], hint: "Граница слова \\b" },
+            { desc: "Найдите IP адрес (простой вариант)", example: "192.168.0.1", regex: ["\\d+\\.\\d+\\.\\d+\\.\\d+"], hint: "Не забудьте экранировать точки" }
+        ],
+        hard: [
+            { desc: "Пароль: мин. 8 симв., есть цифра и буква", example: "password1", regex: ["(?=.*\\d)(?=.*[a-zA-Z]).{8,}"], hint: "Positive Lookahead (?=...)" },
+            { desc: "Текст внутри круглых скобок", example: "(текст)", regex: ["(?<=\\().*?(?=\\))"], hint: "Lookbehind и Lookahead" },
+            { desc: "Повторяющиеся слова подряд", example: "the the cat", regex: ["\\b(\\w+)\\s+\\1\\b"], hint: "Обратная ссылка \\1" },
+            { desc: "URL (http/https)", example: "https://google.com", regex: ["https?:\\/\\/.+"], hint: "? делает 's' необязательным" },
+            { desc: "Число с плавающей точкой", example: "3.14", regex: ["\\d+(\\.\\d+)?"], hint: "Группа с десятичной частью опциональна" }
+        ]
+    };
+
+    let currentLevel = 'easy';
+    let currentTask = null;
+    let stats = { correct: 0, wrong: 0, total: 0 };
+
+    function init() {
+        nextTask();
+        document.getElementById('user-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') checkAnswer();
+        });
+    }
+
+    function resetGame() {
+        currentLevel = document.getElementById('difficulty').value;
+        stats = { correct: 0, wrong: 0, total: 0 };
+        updateStats();
+        document.getElementById('feedback-msg').textContent = '';
+        document.getElementById('feedback-msg').className = 'feedback';
+        nextTask();
+    }
+
+    function getRandomTask() {
+        const levelTasks = tasks[currentLevel];
+        return levelTasks[Math.floor(Math.random() * levelTasks.length)];
+    }
+
+    function nextTask() {
+        currentTask = getRandomTask();
+        document.getElementById('task-text').textContent = currentTask.desc;
+        document.getElementById('task-example').textContent = "Пример: " + currentTask.example;
+        document.getElementById('user-input').value = '';
+        document.getElementById('user-input').focus();
+        document.getElementById('answer-box').style.display = 'none';
+        document.getElementById('feedback-msg').textContent = '';
+        document.getElementById('feedback-msg').className = 'feedback';
+    }
+
+    function showAnswer() {
+        const answerBox = document.getElementById('answer-box');
+        answerBox.style.display = 'block';
+        
+        // Показываем основной ответ и альтернативы
+        let answersHtml = `<strong>Основной ответ:</strong> <code>${currentTask.regex[0]}</code>`;
+        if (currentTask.regex.length > 1) {
+            answersHtml += `<br><small>Альтернативные варианты:<br>`;
+            for (let i = 1; i < currentTask.regex.length; i++) {
+                answersHtml += `<code>${currentTask.regex[i]}</code><br>`;
+            }
+            answersHtml += `</small>`;
+        }
+        answersHtml += `<br><small>💡 ${currentTask.hint}</small>`;
+        
+        answerBox.innerHTML = answersHtml;
+    }
+
+    function checkAnswer() {
+        const userInput = document.getElementById('user-input').value.trim();
+        const feedback = document.getElementById('feedback-msg');
+        
+        if (!userInput) {
+            feedback.textContent = "Введите выражение!";
+            feedback.className = 'feedback error';
+            return;
+        }
+
+        // Очищаем ввод от обрамляющих слешей /.../ если они есть
+        let cleanInput = userInput;
+        if (cleanInput.startsWith('/') && cleanInput.lastIndexOf('/') > 0) {
+             cleanInput = cleanInput.slice(1, cleanInput.lastIndexOf('/'));
+        }
+
+        stats.total++;
+        
+        // Проверяем совпадение с ЛЮБЫМ из допустимых вариантов
+        const isCorrect = currentTask.regex.some(validRegex => validRegex === cleanInput);
+        
+        if (isCorrect) {
+            stats.correct++;
+            feedback.textContent = "Верно! Молодец! ";
+            feedback.className = 'feedback success';
+        } else {
+            stats.wrong++;
+            feedback.textContent = "Неверно. Попробуйте еще раз.";
+            feedback.className = 'feedback error';
+        }
+        updateStats();
+    }
+
+    function updateStats() {
+        document.getElementById('score-correct').textContent = stats.correct;
+        document.getElementById('score-wrong').textContent = stats.wrong;
+        document.getElementById('score-total').textContent = stats.total;
+    }
+
+    function toggleModal() {
+        const modal = document.getElementById('help-modal');
+        modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+    }
+
+    window.onload = init;
+</script>
+
+</body>
+</html>

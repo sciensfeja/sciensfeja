@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⌨️ Тренажёр клавиатуры — УчиИграючи!</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(135deg, #1a0b2e 0%, #2d1b4e 50%, #1a0b2e 100%);
+    color: #fff;
+    min-height: 100vh;
+    padding: 20px;
+    overflow-x: hidden;
+  }
+
+  .trainer-container { max-width: 1000px; margin: 0 auto; }
+
+  .trainer-header { text-align: center; margin-bottom: 25px; }
+  .trainer-header h1 {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    background: linear-gradient(90deg, #ff6b9d, #c44dff, #4d79ff);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+  }
+  .trainer-header p { color: #b8a8d8; font-size: 1.05rem; }
+
+  .switchers {
+    display: flex; justify-content: center; gap: 20px;
+    margin: 20px 0; flex-wrap: wrap;
+  }
+  .switcher-group {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 18px;
+    padding: 8px;
+    backdrop-filter: blur(10px);
+  }
+  .switcher-label {
+    display: block;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #b8a8d8;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .lang-btn {
+    padding: 10px 18px;
+    border: none;
+    background: transparent;
+    color: #fff;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .lang-btn:hover { background: rgba(196, 77, 255, 0.2); }
+  .lang-btn.active {
+    background: linear-gradient(135deg, #ff6b9d, #c44dff);
+    box-shadow: 0 4px 15px rgba(196, 77, 255, 0.4);
+  }
+  .lang-flag { font-size: 1.2rem; }
+
+  .trainer-card {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 25px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+
+  .level-info {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px; flex-wrap: wrap; gap: 10px;
+  }
+  .level-badge {
+    background: linear-gradient(135deg, #ff6b9d, #c44dff);
+    padding: 8px 18px; border-radius: 50px;
+    font-weight: 700; font-size: 0.95rem;
+    box-shadow: 0 4px 15px rgba(196, 77, 255, 0.4);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .level-name {
+    opacity: 0.9;
+    font-weight: 500;
+    font-size: 0.85rem;
+  }
+  .reset-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff; padding: 8px 16px;
+    border-radius: 50px; cursor: pointer;
+    font-size: 0.9rem; transition: all 0.3s;
+  }
+  .reset-btn:hover {
+    background: rgba(255, 107, 157, 0.2);
+    border-color: #ff6b9d;
+  }
+
+  .input-area {
+    text-align: center;
+    margin: 20px 0;
+    padding: 25px 20px;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 20px;
+    border: 2px solid rgba(196, 77, 255, 0.2);
+  }
+
+  .current-task {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 3px;
+    margin-bottom: 15px;
+    word-break: break-all;
+    line-height: 1.5;
+  }
+  .current-task.smiley {
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    letter-spacing: 5px;
+    background: linear-gradient(90deg, #ffeb3b, #ff9100, #ff6b9d);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .char-done { color: #00e676; }
+
+  /* ===== ИСПРАВЛЕННЫЙ КУРСОР ===== */
+  .char-current {
+    background: rgba(196, 77, 255, 0.35);
+    border: 2px solid #c44dff;
+    padding: 2px 8px;
+    border-radius: 8px;
+    color: #fff;
+    text-shadow: 0 0 12px rgba(196, 77, 255, 0.9), 0 0 4px rgba(255, 255, 255, 0.5);
+    animation: pulse 1.2s infinite;
+    display: inline-block;
+    box-shadow: 0 0 20px rgba(196, 77, 255, 0.6), inset 0 0 12px rgba(196, 77, 255, 0.3);
+    backdrop-filter: blur(4px);
+    position: relative;
+  }
+  /* Для смайликов — возвращаем естественный цвет эмодзи */
+  .current-task.smiley .char-current {
+    -webkit-text-fill-color: initial;
+    text-shadow: 0 0 15px rgba(255, 235, 59, 0.8);
+    border-color: #ffeb3b;
+    background: rgba(255, 235, 59, 0.25);
+    box-shadow: 0 0 20px rgba(255, 235, 59, 0.6), inset 0 0 12px rgba(255, 235, 59, 0.3);
+  }
+
+  .char-pending { color: rgba(255, 255, 255, 0.35); }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
+
+  .hint-box {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 15px auto 0;
+    padding: 12px 20px;
+    border-radius: 14px;
+    font-weight: 600;
+    animation: hintGlow 1.5s infinite;
+    max-width: 550px;
+    flex-wrap: wrap;
+  }
+  .hint-box.show { display: flex; }
+  .hint-box.shift {
+    background: linear-gradient(135deg, rgba(255, 145, 0, 0.2), rgba(255, 107, 157, 0.2));
+    border: 2px solid #ff9100;
+    color: #ffeb3b;
+  }
+  .hint-box.lang {
+    background: linear-gradient(135deg, rgba(77, 121, 255, 0.25), rgba(0, 212, 255, 0.25));
+    border: 2px solid #4d79ff;
+    color: #00d4ff;
+    font-size: 1.05rem;
+  }
+  .hint-box.lang.alert {
+    background: linear-gradient(135deg, rgba(255, 59, 59, 0.25), rgba(255, 107, 157, 0.25));
+    border: 2px solid #ff3b3b;
+    color: #ff6b6b;
+    animation: alertGlow 0.8s infinite;
+  }
+  .hint-box.altgr {
+    background: linear-gradient(135deg, rgba(0, 230, 118, 0.2), rgba(0, 212, 255, 0.2));
+    border: 2px solid #00e676;
+    color: #b9f6ca;
+  }
+
+  @keyframes hintGlow {
+    0%, 100% { box-shadow: 0 0 10px currentColor; opacity: 0.9; }
+    50% { box-shadow: 0 0 25px currentColor; opacity: 1; }
+  }
+  @keyframes alertGlow {
+    0%, 100% { box-shadow: 0 0 15px #ff3b3b; transform: scale(1); }
+    50% { box-shadow: 0 0 35px #ff3b3b, 0 0 60px rgba(255, 59, 59, 0.5); transform: scale(1.02); }
+  }
+
+  .key-icon {
+    display: inline-block;
+    background: linear-gradient(135deg, #ff9100, #ff6b9d);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(255, 145, 0, 0.5);
+    min-width: 50px;
+  }
+  .key-icon.blue {
+    background: linear-gradient(135deg, #4d79ff, #00d4ff);
+    box-shadow: 0 4px 12px rgba(77, 121, 255, 0.5);
+  }
+  .key-icon.green {
+    background: linear-gradient(135deg, #00e676, #00d4ff);
+    box-shadow: 0 4px 12px rgba(0, 230, 118, 0.5);
+  }
+  .key-icon.red {
+    background: linear-gradient(135deg, #ff3b3b, #ff6b9d);
+    box-shadow: 0 4px 12px rgba(255, 59, 59, 0.5);
+    animation: keyPulse 0.8s infinite;
+  }
+
+  .hint-detail {
+    font-size: 0.85rem;
+    opacity: 0.85;
+    font-weight: 400;
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  .keyboard {
+    margin-top: 25px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .kb-row {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-bottom: 5px;
+  }
+  .kb-key {
+    position: relative;
+    min-width: 42px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    color: #fff;
+    transition: all 0.15s;
+    user-select: none;
+    padding: 2px 4px;
+  }
+  .kb-key .kb-top {
+    font-size: 0.7rem;
+    color: #b8a8d8;
+    line-height: 1;
+  }
+  .kb-key .kb-bot {
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1;
+  }
+  .kb-key.wide { min-width: 70px; font-size: 0.75rem; }
+  .kb-key.space { flex: 1; max-width: 320px; }
+  .kb-key.tab { min-width: 60px; }
+  .kb-key.caps { min-width: 75px; }
+  .kb-key.enter { min-width: 85px; }
+  .kb-key.shift { min-width: 95px; }
+  .kb-key.backspace { min-width: 85px; }
+
+  .kb-key.active-normal {
+    background: linear-gradient(135deg, #c44dff, #4d79ff);
+    border-color: #c44dff;
+    box-shadow: 0 0 20px #c44dff, 0 0 40px rgba(196, 77, 255, 0.5);
+    animation: keyPulse 1s infinite;
+    transform: translateY(-2px);
+  }
+  .kb-key.active-shift {
+    background: linear-gradient(135deg, #ff9100, #ff6b9d);
+    border-color: #ff9100;
+    box-shadow: 0 0 20px #ff9100, 0 0 40px rgba(255, 145, 0, 0.5);
+    animation: keyPulse 1s infinite;
+    transform: translateY(-2px);
+  }
+  .kb-key.active-altgr {
+    background: linear-gradient(135deg, #00e676, #00d4ff);
+    border-color: #00e676;
+    box-shadow: 0 0 20px #00e676, 0 0 40px rgba(0, 230, 118, 0.5);
+    animation: keyPulse 1s infinite;
+    transform: translateY(-2px);
+  }
+  .kb-key.active-mod {
+    background: linear-gradient(135deg, #ff9100, #ff6b9d);
+    border-color: #ff9100;
+    box-shadow: 0 0 25px #ff9100, 0 0 50px rgba(255, 145, 0, 0.6);
+    animation: keyPulse 0.8s infinite;
+    transform: translateY(-2px);
+  }
+  .kb-key.wrong-key {
+    background: linear-gradient(135deg, #ff3b3b, #ff6b9d);
+    border-color: #ff3b3b;
+    box-shadow: 0 0 20px #ff3b3b, 0 0 40px rgba(255, 59, 59, 0.5);
+    animation: keyPulse 0.6s infinite;
+    transform: translateY(-2px);
+  }
+  .kb-key.pressed {
+    transform: translateY(2px);
+    background: rgba(255, 255, 255, 0.25);
+  }
+
+  @keyframes keyPulse {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.4); }
+  }
+
+  .input-field {
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 1.2rem;
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(196, 77, 255, 0.4);
+    border-radius: 14px;
+    color: #fff;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 3px;
+    outline: none;
+    transition: all 0.3s;
+    margin-top: 15px;
+  }
+  .input-field:focus {
+    border-color: #c44dff;
+    box-shadow: 0 0 20px rgba(196, 77, 255, 0.4);
+  }
+  .input-field.error { border-color: #ff3b3b; animation: shake 0.4s; }
+  .input-field.success {
+    border-color: #00e676;
+    box-shadow: 0 0 20px rgba(0, 230, 118, 0.4);
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .stat-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 14px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .stat-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, #ff6b9d, #c44dff);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .stat-label {
+    font-size: 0.85rem;
+    color: #b8a8d8;
+    margin-top: 4px;
+  }
+
+  .success-modal {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 100;
+    align-items: center; justify-content: center;
+    backdrop-filter: blur(8px);
+  }
+  .success-modal.show { display: flex; }
+  .success-content {
+    background: linear-gradient(135deg, #2d1b4e, #1a0b2e);
+    padding: 40px;
+    border-radius: 24px;
+    text-align: center;
+    border: 2px solid #c44dff;
+    box-shadow: 0 20px 60px rgba(196, 77, 255, 0.5);
+    max-width: 400px;
+    animation: modalIn 0.4s;
+  }
+  @keyframes modalIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .success-emoji {
+    font-size: 4rem;
+    margin-bottom: 10px;
+    animation: bounce 1s infinite;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  .success-content h2 {
+    font-size: 2rem; margin-bottom: 10px;
+    background: linear-gradient(90deg, #ff6b9d, #c44dff);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .success-content p { color: #b8a8d8; margin-bottom: 20px; }
+  .next-btn {
+    background: linear-gradient(135deg, #ff6b9d, #c44dff);
+    color: #fff; border: none;
+    padding: 12px 30px; border-radius: 50px;
+    font-size: 1rem; font-weight: 600;
+    cursor: pointer; transition: transform 0.3s;
+  }
+  .next-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(196, 77, 255, 0.5);
+  }
+
+  .back-nav { text-align: center; margin-top: 30px; }
+  .back-btn {
+    display: inline-block;
+    padding: 12px 28px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff; border-radius: 50px;
+    text-decoration: none; font-weight: 600;
+    transition: all 0.3s;
+  }
+  .back-btn:hover {
+    background: linear-gradient(135deg, #ff6b9d, #c44dff);
+    border-color: transparent;
+    transform: translateY(-3px);
+  }
+
+  #confetti-container {
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 9999;
+  }
+  .confetti {
+    position: absolute;
+    animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall {
+    0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+    100% {
+      transform: translate(var(--tx), var(--ty)) rotate(720deg);
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .kb-key { min-width: 28px; height: 40px; font-size: 0.7rem; }
+    .kb-key .kb-top { font-size: 0.6rem; }
+    .kb-key .kb-bot { font-size: 0.8rem; }
+    .kb-key.wide, .kb-key.tab, .kb-key.caps, .kb-key.enter { min-width: 40px; }
+    .kb-key.shift, .kb-key.backspace { min-width: 55px; }
+    .switchers { gap: 10px; }
+    .lang-btn { padding: 8px 12px; font-size: 0.85rem; }
+  }
+ /* ===== Плавающая кнопка "Домой" ===== */
+.home-fab {
+  position: fixed;
+  left: 24px;
+  bottom: 24px;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  transform: translateY(20px) scale(0.9);
+  pointer-events: none;
+}
+
+/* Появляется после прокрутки */
+.home-fab.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.home-fab:hover {
+  background: linear-gradient(135deg, #ff6b9d, #c44dff);
+  border-color: transparent;
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 12px 32px rgba(196, 77, 255, 0.5);
+}
+
+.home-fab:active {
+  transform: translateY(-2px) scale(1);
+}
+
+.home-icon {
+  font-size: 1.3rem;
+  transition: transform 0.3s;
+}
+
+.home-fab:hover .home-icon {
+  transform: rotate(-15deg) scale(1.2);
+  animation: houseBounce 0.6s;
+}
+
+@keyframes houseBounce {
+  0%, 100% { transform: rotate(-15deg) scale(1.2) translateY(0); }
+  50% { transform: rotate(-15deg) scale(1.2) translateY(-4px); }
+}
+
+.home-label {
+  letter-spacing: 0.5px;
+}
+
+/* Адаптив: на мобильных только иконка */
+@media (max-width: 600px) {
+  .home-fab {
+    padding: 14px;
+    left: 16px;
+    bottom: 16px;
+  }
+  .home-label { display: none; }
+  .home-icon { font-size: 1.5rem; }
+}
+</style>
+</head>
+<body>
+<!-- Плавающая кнопка "Домой" -->
+<a href="../index.html" class="home-fab" id="homeFab" title="Вернуться на главную">
+  <span class="home-icon">🏠</span>
+  <span class="home-label">Домой</span>
+</a>
+<div id="confetti-container"></div>
+
+<div class="trainer-container">
+  <header class="trainer-header">
+    <h1 id="mainTitle">⌨️ Тренажёр клавиатуры</h1>
+    <p id="mainSubtitle">Выбери язык и прокачай скорость печати!</p>
+  </header>
+
+  <div class="switchers">
+    <div class="switcher-group">
+      <span class="switcher-label" id="labelLang">Язык заданий</span>
+      <button class="lang-btn active" data-lang="ru"><span class="lang-flag">🇷🇺</span> Русский</button>
+      <button class="lang-btn" data-lang="en"><span class="lang-flag">🇧</span> English</button>
+      <button class="lang-btn" data-lang="de"><span class="lang-flag">🇩</span> Deutsch</button>
+      <button class="lang-btn" data-lang="es"><span class="lang-flag">🇪🇸</span> Español</button>
+    </div>
+    <div class="switcher-group">
+      <span class="switcher-label" id="labelUi">Язык интерфейса</span>
+      <button class="lang-btn active" data-ui="ru"><span class="lang-flag">🇷🇺</span> RU</button>
+      <button class="lang-btn" data-ui="en"><span class="lang-flag">🇬🇧</span> EN</button>
+      <button class="lang-btn" data-ui="de"><span class="lang-flag">🇪</span> DE</button>
+      <button class="lang-btn" data-ui="es"><span class="lang-flag">🇪</span> ES</button>
+    </div>
+  </div>
+
+  <div class="trainer-card">
+    <div class="level-info">
+      <div class="level-badge" id="levelBadge">
+        <span id="levelNumber">Уровень 1</span>
+        <span class="level-name" id="levelName">: Улыбка</span>
+      </div>
+      <button class="reset-btn" id="resetBtn"> <span data-i18n="reset">Сброс уровня</span></button>
+    </div>
+
+    <div class="input-area">
+      <div class="current-task" id="currentTask"></div>
+
+      <div class="hint-box shift" id="hintShift">
+        <span class="key-icon">⇧ Shift</span>
+        <span id="hintShiftText">Нажми Shift</span>
+      </div>
+      <div class="hint-box altgr" id="hintAltgr">
+        <span class="key-icon green">AltGr</span>
+        <span class="key-icon" id="hintAltgrKey">E</span>
+        <span id="hintAltgrText">AltGr + клавиша</span>
+      </div>
+      <div class="hint-box lang" id="hintLang">
+        <span class="key-icon blue" id="hintLangKey">⌘ Space</span>
+        <span id="hintLangText">Переключи раскладку!</span>
+        <span class="hint-detail" id="hintLangDetail"></span>
+      </div>
+
+      <input type="text" class="input-field" id="inputField"
+        placeholder="Начни печатать здесь..."
+        autocomplete="off" autocorrect="off"
+        autocapitalize="off" spellcheck="false">
+    </div>
+
+    <div class="keyboard" id="keyboard"></div>
+
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-value" id="statLevel">1</div>
+        <div class="stat-label" data-i18n="level">Уровень</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="statErrors">0</div>
+        <div class="stat-label" data-i18n="errors">Ошибки</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="statSpeed">0</div>
+        <div class="stat-label" data-i18n="speed">Симв/мин</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="statAccuracy">100%</div>
+        <div class="stat-label" data-i18n="accuracy">Точность</div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="back-nav">
+    <a href="../index.html" class="back-btn">← <span data-i18n="back">Вернуться на главную</span></a>
+  </nav>
+</div>
+
+<div class="success-modal" id="successModal">
+  <div class="success-content">
+    <div class="success-emoji" id="successEmoji">🎉</div>
+    <h2 id="successTitle">Отлично!</h2>
+    <p id="successText">Уровень пройден!</p>
+    <button class="next-btn" id="nextBtn">Следующий уровень ▶</button>
+  </div>
+</div>
+
+<script src="main.js"></script>
+<script>
+const smileys = [
+  { text: ':-)', emoji: '😊', name: { ru: 'Улыбка', en: 'Smile', de: 'Lächeln', es: 'Sonrisa' } },
+  { text: ':-D', emoji: '😁', name: { ru: 'Смех', en: 'Laugh', de: 'Lachen', es: 'Risa' } },
+  { text: '<3', emoji: '❤️', name: { ru: 'Сердце', en: 'Heart', de: 'Herz', es: 'Corazón' } },
+  { text: '^_^', emoji: '😄', name: { ru: 'Радость', en: 'Joy', de: 'Freude', es: 'Alegría' } },
+  { text: ';-)', emoji: '😉', name: { ru: 'Подмигивание', en: 'Wink', de: 'Zwinkern', es: 'Guiño' } },
+  { text: ':-(', emoji: '😢', name: { ru: 'Грусть', en: 'Sad', de: 'Traurig', es: 'Triste' } },
+  { text: ':-P', emoji: '😜', name: { ru: 'Язык', en: 'Tongue', de: 'Zunge', es: 'Lengua' } },
+  { text: 'O_O', emoji: '😮', name: { ru: 'Удивление', en: 'Surprise', de: 'Überraschung', es: 'Sorpresa' } },
+  { text: ':-*', emoji: '😘', name: { ru: 'Поцелуй', en: 'Kiss', de: 'Kuss', es: 'Beso' } },
+  { text: '\\o/', emoji: '🙌', name: { ru: 'Ура!', en: 'Yay!', de: 'Juhu!', es: '¡Yupi!' } }
+];
+
+const tasks = {
+  ru: [
+    "Привет, мир!",
+    "Информатика — это весело!",
+    "Учись, играй, побеждай!",
+    "Быстрая лиса прыгает через ленивого пса.",
+    "Съешь ещё этих мягких французских булок, да выпей чаю.",
+    "Широкая электрификация южных губерний даст мощный толчок.",
+    "В чащах юга жил-был цитрус? Да, но фальшивый экземпляр!"
+  ],
+  en: [
+    "Hello, World!",
+    "The quick brown fox jumps over the lazy dog.",
+    "Pack my box with five dozen liquor jugs.",
+    "How vexingly quick daft zebras jump!",
+    "The five boxing wizards jump quickly.",
+    "Amazingly few discotheques provide jukeboxes."
+  ],
+  de: [
+    "Hallo, Welt!",
+    "Franz jagt im komplett verwahrlosten Taxi quer durch Bayern.",
+    "Öl qualmt über dem großen Äcker.",
+    "Döner und Äpfel — süß und würzig!",
+    "Der schnelle braune Fuchs springt über den faulen Hund.",
+    "Falsches Üben von Xylophonmusik quält jeden größeren Zwerg."
+  ],
+  es: [
+    "¡Hola, mundo!",
+    "El rápido zorro marrón salta sobre el perro perezoso.",
+    "¿Qué hace aquí ese niño español?",
+    "Mañana será un día maravilloso para aprender.",
+    "La niña Ñoña toca el piano con ñ y ¡qué bien!",
+    "Programar es divertido: ¡cada error es una lección!"
+  ]
+};
+
+const i18n = {
+  ru: {
+    title: '️ Тренажёр клавиатуры',
+    subtitle: 'Выбери язык и прокачай скорость печати!',
+    labelLang: 'Язык заданий',
+    labelUi: 'Язык интерфейса',
+    level: 'Уровень',
+    errors: 'Ошибки',
+    speed: 'Симв/мин',
+    accuracy: 'Точность',
+    reset: 'Сброс уровня',
+    back: 'Вернуться на главную',
+    placeholder: 'Начни печатать здесь...',
+    successTitle: '🎉 Отлично!',
+    successText: 'Смайлик набран верно!',
+    successTextNormal: 'Уровень пройден!',
+    nextBtn: 'Следующий уровень ▶',
+    shiftUpper: 'Нажми Shift для заглавной буквы!',
+    shiftSymbol: 'Нажми Shift для этого символа!',
+    altgrText: 'AltGr + клавиша для этого символа',
+    langText: '⚠️ Не та раскладка!',
+    langDetail: 'Нажми Alt+Shift (Win) или ⌘+Space (Mac)',
+    langHint: 'Переключи раскладку!'
+  },
+  en: {
+    title: '⌨️ Keyboard Trainer',
+    subtitle: 'Choose a language and boost your typing speed!',
+    labelLang: 'Task language',
+    labelUi: 'Interface language',
+    level: 'Level',
+    errors: 'Errors',
+    speed: 'Char/min',
+    accuracy: 'Accuracy',
+    reset: 'Reset level',
+    back: 'Back to home',
+    placeholder: 'Start typing here...',
+    successTitle: ' Great!',
+    successText: 'Smiley typed correctly!',
+    successTextNormal: 'Level completed!',
+    nextBtn: 'Next level ▶',
+    shiftUpper: 'Press Shift for uppercase!',
+    shiftSymbol: 'Press Shift for this symbol!',
+    altgrText: 'AltGr + key for this symbol',
+    langText: '⚠️ Wrong layout!',
+    langDetail: 'Press Alt+Shift (Win) or ⌘+Space (Mac)',
+    langHint: 'Switch keyboard layout!'
+  },
+  de: {
+    title: '️ Tastatur-Trainer',
+    subtitle: 'Wähle eine Sprache und steigere dein Tempo!',
+    labelLang: 'Aufgabensprache',
+    labelUi: 'Oberflächensprache',
+    level: 'Stufe',
+    errors: 'Fehler',
+    speed: 'Zeich./Min',
+    accuracy: 'Genauigkeit',
+    reset: 'Stufe zurücksetzen',
+    back: 'Zurück zur Startseite',
+    placeholder: 'Hier tippen...',
+    successTitle: ' Super!',
+    successText: 'Smiley korrekt getippt!',
+    successTextNormal: 'Stufe geschafft!',
+    nextBtn: 'Nächste Stufe ▶',
+    shiftUpper: 'Shift für Großbuchstaben drücken!',
+    shiftSymbol: 'Shift für dieses Zeichen drücken!',
+    altgrText: 'AltGr + Taste für dieses Zeichen',
+    langText: '⚠️ Falsches Layout!',
+    langDetail: 'Drücke Alt+Shift (Win) oder ⌘+Space (Mac)',
+    langHint: 'Tastaturlayout wechseln!'
+  },
+  es: {
+    title: '⌨️ Entrenador de teclado',
+    subtitle: '¡Elige un idioma y mejora tu velocidad!',
+    labelLang: 'Idioma de tareas',
+    labelUi: 'Idioma de interfaz',
+    level: 'Nivel',
+    errors: 'Errores',
+    speed: 'Car/min',
+    accuracy: 'Precisión',
+    reset: 'Reiniciar nivel',
+    back: 'Volver al inicio',
+    placeholder: 'Empieza a escribir aquí...',
+    successTitle: '🎉 ¡Genial!',
+    successText: '¡Smiley escrito correctamente!',
+    successTextNormal: '¡Nivel completado!',
+    nextBtn: 'Siguiente nivel ▶',
+    shiftUpper: '¡Presiona Shift para mayúsculas!',
+    shiftSymbol: '¡Presiona Shift para este símbolo!',
+    altgrText: 'AltGr + tecla para este símbolo',
+    langText: '⚠️ ¡Diseño incorrecto!',
+    langDetail: 'Pulsa Alt+Shift (Win) o ⌘+Space (Mac)',
+    langHint: '¡Cambia el diseño del teclado!'
+  }
+};
+
+const layouts = {
+  ru: [
+    [
+      {code:'Backquote', normal:'ё', shift:'Ё'},
+      {code:'Digit1', normal:'1', shift:'!'},
+      {code:'Digit2', normal:'2', shift:'"'},
+      {code:'Digit3', normal:'3', shift:'№'},
+      {code:'Digit4', normal:'4', shift:';'},
+      {code:'Digit5', normal:'5', shift:'%'},
+      {code:'Digit6', normal:'6', shift:':'},
+      {code:'Digit7', normal:'7', shift:'?'},
+      {code:'Digit8', normal:'8', shift:'*'},
+      {code:'Digit9', normal:'9', shift:'('},
+      {code:'Digit0', normal:'0', shift:')'},
+      {code:'Minus', normal:'-', shift:'_'},
+      {code:'Equal', normal:'=', shift:'+'}
+    ],
+    [
+      {code:'KeyQ', normal:'й', shift:'Й'},
+      {code:'KeyW', normal:'ц', shift:'Ц'},
+      {code:'KeyE', normal:'у', shift:'У'},
+      {code:'KeyR', normal:'к', shift:'К'},
+      {code:'KeyT', normal:'е', shift:'Е'},
+      {code:'KeyY', normal:'н', shift:'Н'},
+      {code:'KeyU', normal:'г', shift:'Г'},
+      {code:'KeyI', normal:'ш', shift:'Ш'},
+      {code:'KeyO', normal:'щ', shift:'Щ'},
+      {code:'KeyP', normal:'з', shift:'З'},
+      {code:'BracketLeft', normal:'х', shift:'Х'},
+      {code:'BracketRight', normal:'ъ', shift:'Ъ'},
+      {code:'Backslash', normal:'\\', shift:'/'}
+    ],
+    [
+      {code:'KeyA', normal:'ф', shift:'Ф'},
+      {code:'KeyS', normal:'ы', shift:'Ы'},
+      {code:'KeyD', normal:'в', shift:'В'},
+      {code:'KeyF', normal:'а', shift:'А'},
+      {code:'KeyG', normal:'п', shift:'П'},
+      {code:'KeyH', normal:'р', shift:'Р'},
+      {code:'KeyJ', normal:'о', shift:'О'},
+      {code:'KeyK', normal:'л', shift:'Л'},
+      {code:'KeyL', normal:'д', shift:'Д'},
+      {code:'Semicolon', normal:'ж', shift:'Ж'},
+      {code:'Quote', normal:'э', shift:'Э'}
+    ],
+    [
+      {code:'KeyZ', normal:'я', shift:'Я'},
+      {code:'KeyX', normal:'ч', shift:'Ч'},
+      {code:'KeyC', normal:'с', shift:'С'},
+      {code:'KeyV', normal:'м', shift:'М'},
+      {code:'KeyB', normal:'и', shift:'И'},
+      {code:'KeyN', normal:'т', shift:'Т'},
+      {code:'KeyM', normal:'ь', shift:'Ь'},
+      {code:'Comma', normal:'б', shift:'Б'},
+      {code:'Period', normal:'ю', shift:'Ю'},
+      {code:'Slash', normal:'.', shift:','}
+    ]
+  ],
+  en: [
+    [
+      {code:'Backquote', normal:'`', shift:'~'},
+      {code:'Digit1', normal:'1', shift:'!'},
+      {code:'Digit2', normal:'2', shift:'@'},
+      {code:'Digit3', normal:'3', shift:'#'},
+      {code:'Digit4', normal:'4', shift:'$'},
+      {code:'Digit5', normal:'5', shift:'%'},
+      {code:'Digit6', normal:'6', shift:'^'},
+      {code:'Digit7', normal:'7', shift:'&'},
+      {code:'Digit8', normal:'8', shift:'*'},
+      {code:'Digit9', normal:'9', shift:'('},
+      {code:'Digit0', normal:'0', shift:')'},
+      {code:'Minus', normal:'-', shift:'_'},
+      {code:'Equal', normal:'=', shift:'+'}
+    ],
+    [
+      {code:'KeyQ', normal:'q', shift:'Q'},
+      {code:'KeyW', normal:'w', shift:'W'},
+      {code:'KeyE', normal:'e', shift:'E'},
+      {code:'KeyR', normal:'r', shift:'R'},
+      {code:'KeyT', normal:'t', shift:'T'},
+      {code:'KeyY', normal:'y', shift:'Y'},
+      {code:'KeyU', normal:'u', shift:'U'},
+      {code:'KeyI', normal:'i', shift:'I'},
+      {code:'KeyO', normal:'o', shift:'O'},
+      {code:'KeyP', normal:'p', shift:'P'},
+      {code:'BracketLeft', normal:'[', shift:'{'},
+      {code:'BracketRight', normal:']', shift:'}'},
+      {code:'Backslash', normal:'\\', shift:'|'}
+    ],
+    [
+      {code:'KeyA', normal:'a', shift:'A'},
+      {code:'KeyS', normal:'s', shift:'S'},
+      {code:'KeyD', normal:'d', shift:'D'},
+      {code:'KeyF', normal:'f', shift:'F'},
+      {code:'KeyG', normal:'g', shift:'G'},
+      {code:'KeyH', normal:'h', shift:'H'},
+      {code:'KeyJ', normal:'j', shift:'J'},
+      {code:'KeyK', normal:'k', shift:'K'},
+      {code:'KeyL', normal:'l', shift:'L'},
+      {code:'Semicolon', normal:';', shift:':'},
+      {code:'Quote', normal:"'", shift:'"'}
+    ],
+    [
+      {code:'KeyZ', normal:'z', shift:'Z'},
+      {code:'KeyX', normal:'x', shift:'X'},
+      {code:'KeyC', normal:'c', shift:'C'},
+      {code:'KeyV', normal:'v', shift:'V'},
+      {code:'KeyB', normal:'b', shift:'B'},
+      {code:'KeyN', normal:'n', shift:'N'},
+      {code:'KeyM', normal:'m', shift:'M'},
+      {code:'Comma', normal:',', shift:'<'},
+      {code:'Period', normal:'.', shift:'>'},
+      {code:'Slash', normal:'/', shift:'?'}
+    ]
+  ],
+  de: [
+    [
+      {code:'Backquote', normal:'^', shift:'°'},
+      {code:'Digit1', normal:'1', shift:'!'},
+      {code:'Digit2', normal:'2', shift:'"', altgr:'²'},
+      {code:'Digit3', normal:'3', shift:'§', altgr:'³'},
+      {code:'Digit4', normal:'4', shift:'$', altgr:'¼'},
+      {code:'Digit5', normal:'5', shift:'%', altgr:'½'},
+      {code:'Digit6', normal:'6', shift:'&', altgr:'¬'},
+      {code:'Digit7', normal:'7', shift:'/', altgr:'{'},
+      {code:'Digit8', normal:'8', shift:'(', altgr:'['},
+      {code:'Digit9', normal:'9', shift:')', altgr:']'},
+      {code:'Digit0', normal:'0', shift:'=', altgr:'}'},
+      {code:'Minus', normal:'ß', shift:'?', altgr:'\\'},
+      {code:'Equal', normal:'´', shift:'`'}
+    ],
+    [
+      {code:'KeyQ', normal:'q', shift:'Q', altgr:'@'},
+      {code:'KeyW', normal:'w', shift:'W'},
+      {code:'KeyE', normal:'e', shift:'E', altgr:'€'},
+      {code:'KeyR', normal:'r', shift:'R'},
+      {code:'KeyT', normal:'t', shift:'T'},
+      {code:'KeyY', normal:'z', shift:'Z'},
+      {code:'KeyU', normal:'u', shift:'U'},
+      {code:'KeyI', normal:'i', shift:'I'},
+      {code:'KeyO', normal:'o', shift:'O'},
+      {code:'KeyP', normal:'p', shift:'P'},
+      {code:'BracketLeft', normal:'ü', shift:'Ü'},
+      {code:'BracketRight', normal:'+', shift:'*', altgr:'~'}
+    ],
+    [
+      {code:'KeyA', normal:'a', shift:'A'},
+      {code:'KeyS', normal:'s', shift:'S'},
+      {code:'KeyD', normal:'d', shift:'D'},
+      {code:'KeyF', normal:'f', shift:'F'},
+      {code:'KeyG', normal:'g', shift:'G'},
+      {code:'KeyH', normal:'h', shift:'H'},
+      {code:'KeyJ', normal:'j', shift:'J'},
+      {code:'KeyK', normal:'k', shift:'K'},
+      {code:'KeyL', normal:'l', shift:'L'},
+      {code:'Semicolon', normal:'ö', shift:'Ö'},
+      {code:'Quote', normal:'ä', shift:'Ä'},
+      {code:'Backslash', normal:'#', shift:"'"}
+    ],
+    [
+      {code:'KeyZ', normal:'y', shift:'Y'},
+      {code:'KeyX', normal:'x', shift:'X'},
+      {code:'KeyC', normal:'c', shift:'C'},
+      {code:'KeyV', normal:'v', shift:'V'},
+      {code:'KeyB', normal:'b', shift:'B'},
+      {code:'KeyN', normal:'n', shift:'N'},
+      {code:'KeyM', normal:'m', shift:'M', altgr:'µ'},
+      {code:'Comma', normal:',', shift:';'},
+      {code:'Period', normal:'.', shift:':'},
+      {code:'Slash', normal:'-', shift:'_'}
+    ]
+  ],
+  es: [
+    [
+      {code:'Backquote', normal:'º', shift:'ª', altgr:'\\'},
+      {code:'Digit1', normal:'1', shift:'!', altgr:'|'},
+      {code:'Digit2', normal:'2', shift:'"', altgr:'@'},
+      {code:'Digit3', normal:'3', shift:'·', altgr:'#'},
+      {code:'Digit4', normal:'4', shift:'$', altgr:'~'},
+      {code:'Digit5', normal:'5', shift:'%', altgr:'€'},
+      {code:'Digit6', normal:'6', shift:'&', altgr:'¬'},
+      {code:'Digit7', normal:'7', shift:'/'},
+      {code:'Digit8', normal:'8', shift:'('},
+      {code:'Digit9', normal:'9', shift:')'},
+      {code:'Digit0', normal:'0', shift:'='},
+      {code:'Minus', normal:"'", shift:'?'},
+      {code:'Equal', normal:'¡', shift:'¿'}
+    ],
+    [
+      {code:'KeyQ', normal:'q', shift:'Q'},
+      {code:'KeyW', normal:'w', shift:'W'},
+      {code:'KeyE', normal:'e', shift:'E'},
+      {code:'KeyR', normal:'r', shift:'R'},
+      {code:'KeyT', normal:'t', shift:'T'},
+      {code:'KeyY', normal:'y', shift:'Y'},
+      {code:'KeyU', normal:'u', shift:'U'},
+      {code:'KeyI', normal:'i', shift:'I'},
+      {code:'KeyO', normal:'o', shift:'O'},
+      {code:'KeyP', normal:'p', shift:'P'},
+      {code:'BracketLeft', normal:'`', shift:'^', altgr:'['},
+      {code:'BracketRight', normal:'+', shift:'*', altgr:']'},
+      {code:'Backslash', normal:'ç', shift:'Ç'}
+    ],
+    [
+      {code:'KeyA', normal:'a', shift:'A'},
+      {code:'KeyS', normal:'s', shift:'S'},
+      {code:'KeyD', normal:'d', shift:'D'},
+      {code:'KeyF', normal:'f', shift:'F'},
+      {code:'KeyG', normal:'g', shift:'G'},
+      {code:'KeyH', normal:'h', shift:'H'},
+      {code:'KeyJ', normal:'j', shift:'J'},
+      {code:'KeyK', normal:'k', shift:'K'},
+      {code:'KeyL', normal:'l', shift:'L'},
+      {code:'Semicolon', normal:'ñ', shift:'Ñ'},
+      {code:'Quote', normal:'´', shift:'¨', altgr:'{'},
+      {code:'Backslash2', normal:'ç', shift:'Ç'}
+    ],
+    [
+      {code:'KeyZ', normal:'z', shift:'Z'},
+      {code:'KeyX', normal:'x', shift:'X'},
+      {code:'KeyC', normal:'c', shift:'C'},
+      {code:'KeyV', normal:'v', shift:'V'},
+      {code:'KeyB', normal:'b', shift:'B'},
+      {code:'KeyN', normal:'n', shift:'N'},
+      {code:'KeyM', normal:'m', shift:'M'},
+      {code:'Comma', normal:',', shift:';'},
+      {code:'Period', normal:'.', shift:':'},
+      {code:'Slash', normal:'-', shift:'_'}
+    ]
+  ]
+};
+
+let currentLang = 'ru';
+let uiLang = 'ru';
+let currentLevel = 0;
+let currentTask = '';
+let currentPos = 0;
+let errors = 0;
+let totalKeys = 0;
+let startTime = null;
+let isSmileyLevel = false;
+let currentSmiley = null;
+let activeKeyboardLang = 'en';
+let layoutMismatchDetected = false;
+
+const taskEl = document.getElementById('currentTask');
+const inputEl = document.getElementById('inputField');
+const levelNumber = document.getElementById('levelNumber');
+const levelName = document.getElementById('levelName');
+const hintShift = document.getElementById('hintShift');
+const hintShiftText = document.getElementById('hintShiftText');
+const hintAltgr = document.getElementById('hintAltgr');
+const hintAltgrKey = document.getElementById('hintAltgrKey');
+const hintAltgrText = document.getElementById('hintAltgrText');
+const hintLang = document.getElementById('hintLang');
+const hintLangKey = document.getElementById('hintLangKey');
+const hintLangText = document.getElementById('hintLangText');
+const hintLangDetail = document.getElementById('hintLangDetail');
+const successModal = document.getElementById('successModal');
+const successEmoji = document.getElementById('successEmoji');
+const successTitle = document.getElementById('successTitle');
+const successText = document.getElementById('successText');
+const nextBtn = document.getElementById('nextBtn');
+const resetBtn = document.getElementById('resetBtn');
+const keyboardEl = document.getElementById('keyboard');
+
+function getCurrentTask() {
+  if (currentLevel < smileys.length) {
+    isSmileyLevel = true;
+    currentSmiley = smileys[currentLevel];
+    return currentSmiley.text;
+  } else {
+    isSmileyLevel = false;
+    currentSmiley = null;
+    const langTasks = tasks[currentLang];
+    return langTasks[(currentLevel - smileys.length) % langTasks.length];
+  }
+}
+
+function renderKeyboard() {
+  const layout = layouts[activeKeyboardLang];
+  let html = '';
+
+  html += '<div class="kb-row">';
+  html += `<div class="kb-key wide" data-code="Escape">Esc</div>`;
+  layout[0].forEach(k => {
+    const top = escapeHtml(k.shift);
+    const bot = escapeHtml(k.normal);
+    const altgrAttr = k.altgr ? `data-altgr="${escapeHtml(k.altgr)}"` : '';
+    html += `<div class="kb-key" data-code="${k.code}" data-normal="${escapeHtml(k.normal)}" data-shift="${escapeHtml(k.shift)}" ${altgrAttr}>
+      <span class="kb-top">${top}</span>
+      <span class="kb-bot">${bot}</span>
+    </div>`;
+  });
+  html += `<div class="kb-key backspace" data-code="Backspace">⌫</div>`;
+  html += '</div>';
+
+  html += '<div class="kb-row">';
+  html += `<div class="kb-key tab wide" data-code="Tab">Tab</div>`;
+  layout[1].forEach(k => {
+    const top = escapeHtml(k.shift);
+    const bot = escapeHtml(k.normal);
+    const altgrAttr = k.altgr ? `data-altgr="${escapeHtml(k.altgr)}"` : '';
+    html += `<div class="kb-key" data-code="${k.code}" data-normal="${escapeHtml(k.normal)}" data-shift="${escapeHtml(k.shift)}" ${altgrAttr}>
+      <span class="kb-top">${top}</span>
+      <span class="kb-bot">${bot}</span>
+    </div>`;
+  });
+  html += '</div>';
+
+  html += '<div class="kb-row">';
+  html += `<div class="kb-key caps wide" data-code="CapsLock">Caps</div>`;
+  layout[2].forEach(k => {
+    const top = escapeHtml(k.shift);
+    const bot = escapeHtml(k.normal);
+    const altgrAttr = k.altgr ? `data-altgr="${escapeHtml(k.altgr)}"` : '';
+    html += `<div class="kb-key" data-code="${k.code}" data-normal="${escapeHtml(k.normal)}" data-shift="${escapeHtml(k.shift)}" ${altgrAttr}>
+      <span class="kb-top">${top}</span>
+      <span class="kb-bot">${bot}</span>
+    </div>`;
+  });
+  html += `<div class="kb-key enter wide" data-code="Enter">↵</div>`;
+  html += '</div>';
+
+  html += '<div class="kb-row">';
+  html += `<div class="kb-key shift" data-code="ShiftLeft">⇧ Shift</div>`;
+  layout[3].forEach(k => {
+    const top = escapeHtml(k.shift);
+    const bot = escapeHtml(k.normal);
+    const altgrAttr = k.altgr ? `data-altgr="${escapeHtml(k.altgr)}"` : '';
+    html += `<div class="kb-key" data-code="${k.code}" data-normal="${escapeHtml(k.normal)}" data-shift="${escapeHtml(k.shift)}" ${altgrAttr}>
+      <span class="kb-top">${top}</span>
+      <span class="kb-bot">${bot}</span>
+    </div>`;
+  });
+  html += `<div class="kb-key shift" data-code="ShiftRight">⇧ Shift</div>`;
+  html += '</div>';
+
+  html += '<div class="kb-row">';
+  html += `<div class="kb-key wide" data-code="ControlLeft">Ctrl</div>`;
+  html += `<div class="kb-key wide" data-code="AltLeft">Alt</div>`;
+  html += `<div class="kb-key space" data-code="Space" data-normal=" " data-shift=" ">␣</div>`;
+  html += `<div class="kb-key wide" data-code="AltRight">AltGr</div>`;
+  html += `<div class="kb-key wide" data-code="ControlRight">Ctrl</div>`;
+  html += '</div>';
+
+  keyboardEl.innerHTML = html;
+}
+
+function escapeHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/[<>&]/g, m => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]));
+}
+
+function findKeyForChar(char) {
+  const layout = layouts[activeKeyboardLang];
+  for (const row of layout) {
+    for (const k of row) {
+      if (k.normal === char) return { key: k, mod: 'normal' };
+      if (k.shift === char) return { key: k, mod: 'shift' };
+      if (k.altgr && k.altgr === char) return { key: k, mod: 'altgr' };
+    }
+  }
+  return null;
+}
+
+function detectLayoutMismatch(typedChar, expectedChar) {
+  for (const [lang, layout] of Object.entries(layouts)) {
+    if (lang === activeKeyboardLang) continue;
+    for (const row of layout) {
+      for (const k of row) {
+        if (k.normal === typedChar || k.shift === typedChar) {
+          const currentLayout = layouts[activeKeyboardLang];
+          for (const curRow of currentLayout) {
+            for (const ck of curRow) {
+              if (ck.code === k.code) {
+                if (ck.normal === expectedChar || ck.shift === expectedChar || (ck.altgr && ck.altgr === expectedChar)) {
+                  return { detected: true, fromLang: lang, keyCode: k.code };
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  return { detected: false };
+}
+
+function highlightKey(char) {
+  document.querySelectorAll('.kb-key').forEach(k => {
+    k.classList.remove('active-normal', 'active-shift', 'active-altgr', 'active-mod', 'wrong-key');
+  });
+
+  if (!char) return;
+
+  if (char === ' ') {
+    const sp = document.querySelector('[data-code="Space"]');
+    if (sp) sp.classList.add('active-normal');
+    return;
+  }
+
+  const result = findKeyForChar(char);
+
+  if (result) {
+    const keyEl = document.querySelector(`[data-code="${result.key.code}"]`);
+    if (keyEl) {
+      if (result.mod === 'shift') {
+        keyEl.classList.add('active-shift');
+        const shiftEl = document.querySelector('[data-code="ShiftLeft"]');
+        if (shiftEl) shiftEl.classList.add('active-mod');
+      } else if (result.mod === 'altgr') {
+        keyEl.classList.add('active-altgr');
+        const altgrEl = document.querySelector('[data-code="AltRight"]');
+        if (altgrEl) altgrEl.classList.add('active-mod');
+      } else {
+        keyEl.classList.add('active-normal');
+      }
+    }
+  }
+}
+
+function highlightWrongKey(typedChar) {
+  document.querySelectorAll('.kb-key').forEach(k => {
+    k.classList.remove('wrong-key');
+  });
+  for (const [lang, layout] of Object.entries(layouts)) {
+    for (const row of layout) {
+      for (const k of row) {
+        if (k.normal === typedChar || k.shift === typedChar) {
+          const keyEl = document.querySelector(`[data-code="${k.code}"]`);
+          if (keyEl) keyEl.classList.add('wrong-key');
+          return;
+        }
+      }
+    }
+  }
+}
+
+function updateHints() {
+  hintShift.classList.remove('show');
+  hintAltgr.classList.remove('show');
+  hintLang.classList.remove('show', 'alert');
+
+  if (currentPos >= currentTask.length) return;
+
+  const nextChar = currentTask[currentPos];
+  const result = findKeyForChar(nextChar);
+
+  if (!result) {
+    hintLang.classList.add('show', 'alert');
+    hintLangKey.textContent = '⌨️';
+    hintLangKey.className = 'key-icon red';
+    hintLangText.textContent = i18n[uiLang].langText;
+    hintLangDetail.textContent = i18n[uiLang].langDetail;
+    return;
+  }
+
+  if (layoutMismatchDetected) {
+    hintLang.classList.add('show', 'alert');
+    hintLangKey.textContent = '⌨️';
+    hintLangKey.className = 'key-icon red';
+    hintLangText.textContent = i18n[uiLang].langText;
+    hintLangDetail.textContent = i18n[uiLang].langDetail;
+    return;
+  }
+
+  if (result.mod === 'shift') {
+    hintShift.classList.add('show');
+    const isUpper = nextChar !== nextChar.toLowerCase() && nextChar === nextChar.toUpperCase() && /\p{L}/u.test(nextChar);
+    hintShiftText.textContent = isUpper ? i18n[uiLang].shiftUpper : i18n[uiLang].shiftSymbol;
+  } else if (result.mod === 'altgr') {
+    hintAltgr.classList.add('show');
+    hintAltgrKey.textContent = result.key.normal.toUpperCase();
+    hintAltgrText.textContent = i18n[uiLang].altgrText;
+  }
+
+  highlightKey(nextChar);
+}
+
+function renderTask() {
+  taskEl.classList.toggle('smiley', isSmileyLevel);
+  let html = '';
+  for (let i = 0; i < currentTask.length; i++) {
+    const ch = currentTask[i] === ' ' ? '&nbsp;' : escapeHtml(currentTask[i]);
+    if (i < currentPos) {
+      html += `<span class="char-done">${ch}</span>`;
+    } else if (i === currentPos) {
+      html += `<span class="char-current">${ch}</span>`;
+    } else {
+      html += `<span class="char-pending">${ch}</span>`;
+    }
+  }
+  taskEl.innerHTML = html;
+  updateHints();
+}
+
+function loadLevel() {
+  currentTask = getCurrentTask();
+  activeKeyboardLang = isSmileyLevel ? 'en' : currentLang;
+  currentPos = 0;
+  errors = 0;
+  totalKeys = 0;
+  startTime = null;
+  layoutMismatchDetected = false;
+  inputEl.value = '';
+  inputEl.classList.remove('error', 'success');
+
+  const t = i18n[uiLang];
+  levelNumber.textContent = `${t.level} ${currentLevel + 1}`;
+  if (isSmileyLevel && currentSmiley) {
+    levelName.textContent = `: ${currentSmiley.name[uiLang]} ${currentSmiley.emoji}`;
+    levelName.style.display = 'inline';
+  } else {
+    levelName.style.display = 'none';
+  }
+
+  updateStats();
+  renderKeyboard();
+  renderTask();
+  inputEl.focus();
+}
+
+inputEl.addEventListener('input', () => {
+  const val = inputEl.value;
+  if (!startTime) startTime = Date.now();
+
+  if (val.length > currentPos) {
+    totalKeys++;
+    const typed = val[val.length - 1];
+    const expected = currentTask[currentPos];
+
+    if (typed === expected) {
+      currentPos++;
+      inputEl.classList.remove('error');
+      inputEl.classList.add('success');
+      setTimeout(() => inputEl.classList.remove('success'), 150);
+      layoutMismatchDetected = false;
+    } else {
+      errors++;
+      inputEl.classList.remove('success');
+      inputEl.classList.add('error');
+      setTimeout(() => inputEl.classList.remove('error'), 300);
+
+      const mismatch = detectLayoutMismatch(typed, expected);
+      if (mismatch.detected) {
+        layoutMismatchDetected = true;
+        hintShift.classList.remove('show');
+        hintAltgr.classList.remove('show');
+        hintLang.classList.add('show', 'alert');
+        hintLangKey.textContent = '⌨️';
+        hintLangKey.className = 'key-icon red';
+        hintLangText.textContent = i18n[uiLang].langText;
+        hintLangDetail.textContent = i18n[uiLang].langDetail;
+        highlightWrongKey(typed);
+      } else {
+        highlightKey(expected);
+      }
+    }
+  } else if (val.length < currentPos) {
+    currentPos = val.length;
+  }
+
+  inputEl.value = currentTask.substring(0, currentPos);
+  updateStats();
+  renderTask();
+
+  if (currentPos >= currentTask.length) {
+    setTimeout(() => showSuccess(), 300);
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+  const code = e.code;
+  const el = document.querySelector(`[data-code="${code}"]`);
+  if (el) el.classList.add('pressed');
+});
+document.addEventListener('keyup', (e) => {
+  const code = e.code;
+  const el = document.querySelector(`[data-code="${code}"]`);
+  if (el) el.classList.remove('pressed');
+});
+
+function updateStats() {
+  document.getElementById('statLevel').textContent = currentLevel + 1;
+  document.getElementById('statErrors').textContent = errors;
+
+  if (startTime) {
+    const minutes = (Date.now() - startTime) / 60000;
+    const speed = minutes > 0 ? Math.round(totalKeys / minutes) : 0;
+    document.getElementById('statSpeed').textContent = speed;
+  }
+
+  const accuracy = totalKeys > 0 ? Math.round(((totalKeys - errors) / totalKeys) * 100) : 100;
+  document.getElementById('statAccuracy').textContent = accuracy + '%';
+}
+
+function showSuccess() {
+  const t = i18n[uiLang];
+  successTitle.textContent = t.successTitle;
+  if (isSmileyLevel && currentSmiley) {
+    successEmoji.textContent = currentSmiley.emoji;
+    successEmoji.style.display = 'block';
+    successText.textContent = t.successText;
+  } else {
+    successEmoji.style.display = 'none';
+    successText.textContent = t.successTextNormal;
+  }
+  nextBtn.textContent = t.nextBtn;
+  successModal.classList.add('show');
+  createConfetti(window.innerWidth / 2, window.innerHeight / 2);
+}
+
+nextBtn.addEventListener('click', () => {
+  successModal.classList.remove('show');
+  currentLevel++;
+  loadLevel();
+});
+
+resetBtn.addEventListener('click', () => {
+  currentLevel = 0;
+  loadLevel();
+});
+
+document.querySelectorAll('[data-lang]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-lang]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentLang = btn.dataset.lang;
+    currentLevel = 0;
+    loadLevel();
+    createConfetti(window.innerWidth / 2, 100);
+  });
+});
+
+document.querySelectorAll('[data-ui]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-ui]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    uiLang = btn.dataset.ui;
+    applyI18n();
+    loadLevel();
+  });
+});
+
+function applyI18n() {
+  const t = i18n[uiLang];
+  document.getElementById('mainTitle').textContent = t.title;
+  document.getElementById('mainSubtitle').textContent = t.subtitle;
+  document.getElementById('labelLang').textContent = t.labelLang;
+  document.getElementById('labelUi').textContent = t.labelUi;
+  document.getElementById('resetBtn').querySelector('span').textContent = t.reset;
+  document.querySelector('.back-btn span').textContent = t.back;
+  inputEl.placeholder = t.placeholder;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (t[key]) el.textContent = t[key];
+  });
+}
+
+applyI18n();
+loadLevel();
+ // Показывать кнопку "Домой" после прокрутки
+const homeFab = document.getElementById('homeFab');
+if (homeFab) {
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 150) {
+      homeFab.classList.add('visible');
+    } else {
+      homeFab.classList.remove('visible');
+    }
+  });
+  // Сразу показать, если страница уже прокручена (например, при обновлении)
+  if (window.scrollY > 150) homeFab.classList.add('visible');
+}
+</script>
+
+</body>
+</html>
