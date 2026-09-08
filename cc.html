@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Позиционные системы счисления — Информатика это весело!</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    line-height: 1.6; 
+    color: #333; 
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+  }
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    overflow: hidden;
+  }
+  header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 40px 20px;
+    text-align: center;
+  }
+  header h1 { font-size: 2.5em; margin-bottom: 10px; }
+  header p { font-size: 1.2em; opacity: 0.9; }
+  nav {
+    background: #f8f9fa;
+    padding: 15px;
+    text-align: center;
+    border-bottom: 3px solid #667eea;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  nav a {
+    color: #667eea;
+    text-decoration: none;
+    margin: 0 10px;
+    font-weight: bold;
+    transition: color 0.3s;
+  }
+  nav a:hover { color: #764ba2; }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+    padding: 30px;
+    background: #f8f9fa;
+  }
+  .stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  .stat-number { font-size: 2.5em; font-weight: bold; color: #667eea; }
+  .stat-label { color: #666; margin-top: 5px; }
+  
+  section { padding: 40px; border-bottom: 1px solid #e0e0e0; }
+  h2 {
+    color: #667eea;
+    font-size: 2em;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #667eea;
+  }
+  h3 { color: #764ba2; font-size: 1.5em; margin: 25px 0 15px 0; }
+  h4 { color: #555; font-size: 1.2em; margin: 20px 0 10px 0; }
+  
+  .example {
+    background: #e3f2fd;
+    border-left: 4px solid #2196f3;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 5px;
+  }
+  .warning {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 5px;
+  }
+  .important {
+    background: #d4edda;
+    border-left: 4px solid #28a745;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 5px;
+  }
+  .info {
+    background: #f3e5f5;
+    border-left: 4px solid #9c27b0;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 5px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+    background: white;
+  }
+  th, td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+  }
+  th { background: #667eea; color: white; }
+  tr:nth-child(even) { background: #f8f9fa; }
+  code {
+    background: #f1f1f1;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    color: #d63384;
+  }
+  pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 10px 0;
+  }
+  .task {
+    background: #f8f9fa;
+    border-left: 4px solid #667eea;
+    padding: 20px;
+    margin: 15px 0;
+    border-radius: 5px;
+  }
+  .solution {
+    background: #e8f5e9;
+    padding: 15px;
+    margin-top: 10px;
+    border-radius: 5px;
+    border-left: 3px solid #28a745;
+  }
+  footer {
+    background: #2c3e50;
+    color: white;
+    text-align: center;
+    padding: 30px;
+  }
+  ul, ol { margin-left: 25px; margin-bottom: 15px; }
+  li { margin-bottom: 8px; }
+  
+  /* 🌐 Мультиязычность */
+  .en, .es, .de { display: none; }
+  body.is-en .ru, body.is-es .ru, body.is-de .ru { display: none !important; }
+  body.is-en .en { display: inline !important; }
+  body.is-es .es { display: inline !important; }
+  body.is-de .de { display: inline !important; }
+  
+  div.en, p.en, h2.en, h3.en, h4.en, li.en, span.en-block { display: none; }
+  div.es, p.es, h2.es, h3.es, h4.es, li.es, span.es-block { display: none; }
+  div.de, p.de, h2.de, h3.de, h4.de, li.de, span.de-block { display: none; }
+  
+  body.is-en div.ru, body.is-en p.ru, body.is-en h2.ru, body.is-en h3.ru, body.is-en h4.ru, body.is-en li.ru, body.is-en span.ru-block { display: none !important; }
+  body.is-en div.en, body.is-en p.en, body.is-en h2.en, body.is-en h3.en, body.is-en h4.en, body.is-en li.en, body.is-en span.en-block { display: block !important; }
+  
+  body.is-es div.ru, body.is-es p.ru, body.is-es h2.ru, body.is-es h3.ru, body.is-es h4.ru, body.is-es li.ru, body.is-es span.ru-block { display: none !important; }
+  body.is-es div.es, body.is-es p.es, body.is-es h2.es, body.is-es h3.es, body.is-es h4.es, body.is-es li.es, body.is-es span.es-block { display: block !important; }
+  
+  body.is-de div.ru, body.is-de p.ru, body.is-de h2.ru, body.is-de h3.ru, body.is-de h4.ru, body.is-de li.ru, body.is-de span.ru-block { display: none !important; }
+  body.is-de div.de, body.is-de p.de, body.is-de h2.de, body.is-de h3.de, body.is-de h4.de, body.is-de li.de, body.is-de span.de-block { display: block !important; }
+  
+  .lang-switcher {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: white;
+    border: 2px solid #667eea;
+    border-radius: 25px;
+    padding: 5px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  .lang-btn {
+    background: none;
+    border: none;
+    padding: 8px 12px;
+    margin: 0 2px;
+    cursor: pointer;
+    border-radius: 20px;
+    font-weight: bold;
+    transition: all 0.3s;
+  }
+  .lang-btn:hover { background: #f0f0f0; }
+  .lang-btn.active { background: #667eea; color: white; }
+  
+  @media (max-width: 768px) {
+    nav a { display: inline-block; margin: 5px; font-size: 0.9em; }
+    section { padding: 20px; }
+    h2 { font-size: 1.5em; }
+  }
+</style>
+</head>
+<body>
+
+<div class="lang-switcher">
+  <button class="lang-btn active" data-lang="ru">🇷🇺 RU</button>
+  <button class="lang-btn" data-lang="en">🇬🇧 EN</button>
+  <button class="lang-btn" data-lang="es">🇪🇸 ES</button>
+  <button class="lang-btn" data-lang="de">🇩🇪 DE</button>
+</div>
+
+<div class="container">
+
+<header>
+  <h1>
+    <span class="ru">🔢 Позиционные системы счисления</span>
+    <span class="en">🔢 Positional Numeral Systems</span>
+    <span class="es">🔢 Sistemas de Numeración Posicionales</span>
+    <span class="de">🔢 Positionale Zahlensysteme</span>
+  </h1>
+  <p>
+    <span class="ru">Информатика это весело!</span>
+    <span class="en">Computer Science is Fun!</span>
+    <span class="es">¡La informática es divertida!</span>
+    <span class="de">Informatik macht Spaß!</span>
+  </p>
+</header>
+
+<nav>
+  <a href="#basics"><span class="ru">🔤 Основы</span><span class="en">🔤 Basics</span><span class="es">🔤 Fundamentos</span><span class="de">🔤 Grundlagen</span></a>
+  <a href="#integers"><span class="ru">🔢 Целые</span><span class="en">🔢 Integers</span><span class="es">🔢 Enteros</span><span class="de">🔢 Ganze</span></a>
+  <a href="#fractions"><span class="ru">🥧 Дробные</span><span class="en">🥧 Fractions</span><span class="es">🥧 Fracciones</span><span class="de">🥧 Brüche</span></a>
+  <a href="#periodic"><span class="ru">🔄 Период.</span><span class="en">🔄 Periodic</span><span class="es">🔄 Periód.</span><span class="de">🔄 Period.</span></a>
+  <a href="#balanced"><span class="ru">⚖️ Уравн.</span><span class="en">⚖️ Balanced</span><span class="es">⚖️ Equil.</span><span class="de">⚖️ Ausgew.</span></a>
+  <a href="#questions"><span class="ru">❓ Вопросы</span><span class="en">❓ Questions</span><span class="es">❓ Preguntas</span><span class="de">❓ Fragen</span></a>
+  <a href="#tasks"><span class="ru">🏆 Задачи</span><span class="en">🏆 Tasks</span><span class="es">🏆 Tareas</span><span class="de">🏆 Aufgaben</span></a>
+</nav>
+
+<div class="stats">
+  <div class="stat-card"><div class="stat-number">6</div><div class="stat-label"><span class="ru">📚 Разделов теории</span><span class="en">📚 Theory Sections</span><span class="es">📚 Secciones</span><span class="de">📚 Abschnitte</span></div></div>
+  <div class="stat-card"><div class="stat-number">19</div><div class="stat-label"><span class="ru">❓ Вопросов</span><span class="en">❓ Questions</span><span class="es">❓ Preguntas</span><span class="de">❓ Fragen</span></div></div>
+  <div class="stat-card"><div class="stat-number">41</div><div class="stat-label"><span class="ru">🎯 Задач с решениями</span><span class="en">🎯 Tasks with Solutions</span><span class="es">🎯 Tareas</span><span class="de">🎯 Aufgaben</span></div></div>
+  <div class="stat-card"><div class="stat-number">∞</div><div class="stat-label"><span class="ru">💡 Возможностей</span><span class="en">💡 Possibilities</span><span class="es">💡 Posibilidades</span><span class="de">💡 Möglichkeiten</span></div></div>
+</div>
+
+<!-- 🔤 ОСНОВЫ -->
+<section id="basics">
+  <h2><span class="ru">🔤 Основные понятия</span><span class="en">🔤 Basic Concepts</span><span class="es">🔤 Conceptos Básicos</span><span class="de">🔤 Grundbegriffe</span></h2>
+  
+  <div class="ru">
+    <p><strong>Позиционная система счисления</strong> — это такая система, в которой значение цифры («вес») полностью определяется её местом (позицией) в записи числа.</p>
+    <div class="example">
+      💡 <strong>Пример:</strong> В числе <code>6375</code> цифра <code>6</code> обозначает тысячи (6000), <code>3</code> — сотни (300), <code>7</code> — десятки (70), а <code>5</code> — единицы:
+      <br><code>6375 = 6·1000 + 3·100 + 7·10 + 5·1</code>
+    </div>
+    <ul>
+      <li><strong>🔡 Алфавит системы:</strong> Набор используемых цифр. Например, в десятичной: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9.</li>
+      <li><strong>🔢 Основание системы:</strong> Количество цифр в алфавите (мощность алфавита). В десятичной системе основание равно 10. Число 10, вероятно, было выбрано потому, что люди сначала использовали для счёта свои 10 пальцев на руках.</li>
+      <li><strong>📍 Разряд:</strong> Позиция цифры в числе. Разряды целых чисел нумеруются справа налево, начиная с нуля.</li>
+    </ul>
+    <p>В числе <code>6375</code> цифра <code>6</code> стоит в третьем разряде (тысячи, 10³), <code>3</code> — во втором (сотни, 10²), <code>7</code> — в первом (десятки, 10¹), а <code>5</code> — в нулевом (единицы, 10⁰). Не забывайте, что любое число (кроме нуля!) в нулевой степени равно 1.</p>
+    
+    <h3>📐 Развёрнутая форма записи</h3>
+    <pre>разряды →  3   2   1   0
+6375 = 6·10³ + 3·10² + 7·10¹ + 5·10⁰</pre>
+    <div class="important">
+      🎯 <strong>Важно:</strong> Последняя цифра — это остаток от деления числа на основание. Поэтому все числа, делящиеся на 100 без остатка, оканчиваются на два нуля!
+    </div>
+    
+    <h3>🧮 Схема Горнера</h3>
+    <p>Удобная форма, использующая только умножение и сложение:</p>
+    <p><code>6375 = ((6·10 + 3)·10 + 7)·10 + 5</code></p>
+    <p>Эта форма позволяет найти число, используя только умножение и сложение (без возведения в степень).</p>
+    
+    <div class="info">
+      🌍 <strong>Другие системы в жизни:</strong>
+      <ul>
+        <li>🖥️ <strong>Двоичная, восьмеричная, шестнадцатеричная</strong> — в компьютерной технике</li>
+        <li>📏 <strong>Двенадцатеричная</strong> — английская система мер (1 фут = 12 дюймов, 1 шиллинг = 12 пенсов)</li>
+        <li>⏰ <strong>Шестидесятеричная</strong> — время (1 час = 60 минут, 1 минута = 60 секунд)</li>
+      </ul>
+    </div>
+  </div>
+  
+  <div class="en">
+    <p>A <strong>positional numeral system</strong> is a system where the value of a digit is entirely determined by its position in the number.</p>
+    <div class="example">💡 <strong>Example:</strong> In <code>6375</code>, digit <code>6</code> = thousands (6000), <code>3</code> = hundreds (300), <code>7</code> = tens (70), <code>5</code> = units.</div>
+    <ul>
+      <li><strong>🔡 Alphabet:</strong> Set of digits used.</li>
+      <li><strong>🔢 Base:</strong> Number of digits in the alphabet. Decimal base = 10.</li>
+      <li><strong>📍 Position:</strong> Digit's place, numbered right-to-left starting from 0.</li>
+    </ul>
+    <h3>📐 Expanded Form</h3>
+    <p><code>6375 = 6·10³ + 3·10² + 7·10¹ + 5·10⁰</code></p>
+    <h3>🧮 Horner's Scheme</h3>
+    <p><code>6375 = ((6·10 + 3)·10 + 7)·10 + 5</code></p>
+  </div>
+  
+  <div class="es">
+    <p>Un <strong>sistema de numeración posicional</strong> es un sistema donde el valor de un dígito está determinado por su posición.</p>
+    <div class="example">💡 <strong>Ejemplo:</strong> En <code>6375</code>, <code>6</code> = miles, <code>3</code> = cientos, <code>7</code> = decenas, <code>5</code> = unidades.</div>
+    <h3>📐 Forma Expandida</h3>
+    <p><code>6375 = 6·10³ + 3·10² + 7·10¹ + 5·10⁰</code></p>
+    <h3>🧮 Esquema de Horner</h3>
+    <p><code>6375 = ((6·10 + 3)·10 + 7)·10 + 5</code></p>
+  </div>
+  
+  <div class="de">
+    <p>Ein <strong>positionales Zahlensystem</strong> ist ein System, bei dem der Wert einer Ziffer durch ihre Position bestimmt wird.</p>
+    <div class="example">💡 <strong>Beispiel:</strong> In <code>6375</code>: <code>6</code> = Tausender, <code>3</code> = Hunderter, <code>7</code> = Zehner, <code>5</code> = Einer.</div>
+    <h3>📐 Erweiterte Form</h3>
+    <p><code>6375 = 6·10³ + 3·10² + 7·10¹ + 5·10⁰</code></p>
+    <h3>🧮 Horner-Schema</h3>
+    <p><code>6375 = ((6·10 + 3)·10 + 7)·10 + 5</code></p>
+  </div>
+</section>
+
+<!-- 🔢 ЦЕЛЫЕ ЧИСЛА -->
+<section id="integers">
+  <h2><span class="ru">🔢 Целые числа</span><span class="en">🔢 Integers</span><span class="es">🔢 Enteros</span><span class="de">🔢 Ganze Zahlen</span></h2>
+  
+  <div class="ru">
+    <p>Для системы счисления с основанием <code>p > 1</code> алфавит состоит из цифр от 0 до <code>p−1</code>, т.е. «старшая» цифра на единицу меньше основания.</p>
+    
+    <h3>📝 Развёрнутая форма</h3>
+    <pre>разряды →  3    2    1    0
+a₃a₂a₁a₀ = a₃·p³ + a₂·p² + a₁·p¹ + a₀·p⁰</pre>
+    
+    <h3>🧮 Схема Горнера</h3>
+    <p><code>a₃a₂a₁a₀ = ((a₃·p + a₂)·p + a₁)·p + a₀</code></p>
+    
+    <div class="example">
+      ✨ <strong>Пример:</strong> Переведём число <code>1234₅</code> в десятичную систему:
+      <br><code>1234₅ = 1·5³ + 2·5² + 3·5¹ + 4·5⁰ = 125 + 50 + 15 + 4 = 194</code>
+      <br>Или по схеме Горнера: <code>((1·5 + 2)·5 + 3)·5 + 4 = 194</code>
+    </div>
+    <p>Схема Горнера очень удобна для обработки данных при вводе чисел с клавиатуры, когда цифры числа вводятся последовательно, начиная с первой, и их количество заранее неизвестно.</p>
+    
+    <h3>🔄 Обратный перевод: из десятичной в p-ичную</h3>
+    <p>Развернутую запись числа можно использовать для обратного перевода — из формулы следует, что <code>a₀</code> — это остаток от деления исходного числа на основание <code>p</code>.</p>
+    <div class="important">
+      <strong>📌 Алгоритм:</strong>
+      <ol>
+        <li>1️⃣ Делим число на <code>p</code>, запоминаем остаток.</li>
+        <li>2️⃣ Делим полученное частное на <code>p</code>, снова запоминаем остаток.</li>
+        <li>3️⃣ Повторяем, пока частное не станет равно 0.</li>
+        <li>4️⃣ Выписываем остатки в обратном порядке.</li>
+      </ol>
+    </div>
+    <div class="example">
+      ✨ <strong>Пример:</strong> Переведём <code>194</code> в пятеричную систему (p=5):
+      <pre>194 / 5 = 38 (ост. 4)
+38  / 5 = 7  (ост. 3)
+7   / 5 = 1  (ост. 2)
+1   / 5 = 0  (ост. 1)
+Ответ: 1234₅</pre>
+    </div>
+  </div>
+  
+  <div class="en">
+    <p>For a system with base <code>p > 1</code>, the alphabet consists of digits 0 to <code>p−1</code>.</p>
+    <h3>📝 Expanded Form</h3>
+    <p><code>a₃a₂a₁a₀ = a₃·p³ + a₂·p² + a₁·p¹ + a₀·p⁰</code></p>
+    <h3>🧮 Horner's Scheme</h3>
+    <p><code>a₃a₂a₁a₀ = ((a₃·p + a₂)·p + a₁)·p + a₀</code></p>
+    <div class="example">✨ <strong>Example:</strong> <code>1234₅ = 1·125 + 2·25 + 3·5 + 4 = 194</code></div>
+    <h3>🔄 Reverse Conversion</h3>
+    <p>Divide by <code>p</code>, memorize remainders, write them in reverse order.</p>
+  </div>
+  
+  <div class="es">
+    <p>Para base <code>p > 1</code>, el alfabeto son dígitos de 0 a <code>p−1</code>.</p>
+    <h3>📝 Forma Expandida</h3>
+    <p><code>a₃a₂a₁a₀ = a₃·p³ + a₂·p² + a₁·p¹ + a₀·p⁰</code></p>
+    <h3>🧮 Esquema de Horner</h3>
+    <p><code>a₃a₂a₁a₀ = ((a₃·p + a₂)·p + a₁)·p + a₀</code></p>
+  </div>
+  
+  <div class="de">
+    <p>Für Basis <code>p > 1</code> besteht das Alphabet aus Ziffern 0 bis <code>p−1</code>.</p>
+    <h3>📝 Erweiterte Form</h3>
+    <p><code>a₃a₂a₁a₀ = a₃·p³ + a₂·p² + a₁·p¹ + a₀·p⁰</code></p>
+    <h3>🧮 Horner-Schema</h3>
+    <p><code>a₃a₂a₁a₀ = ((a₃·p + a₂)·p + a₁)·p + a₀</code></p>
+  </div>
+</section>
+
+<!-- 🥧 ДРОБНЫЕ ЧИСЛА -->
+<section id="fractions">
+  <h2><span class="ru">🥧 Дробные числа</span><span class="en">🥧 Fractions</span><span class="es">🥧 Fracciones</span><span class="de">🥧 Bruchzahlen</span></h2>
+  
+  <div class="ru">
+    <p>Для дробной части используются отрицательные разряды:</p>
+    <pre>разряды →  -1   -2   -3   -4
+0,6375 = 6·10⁻¹ + 3·10⁻² + 7·10⁻³ + 5·10⁻⁴</pre>
+    <p>Это число можно представить также с помощью схемы Горнера:</p>
+    <p><code>0,6375 = 10⁻¹ · (6 + 10⁻¹ · (3 + 10⁻¹ · (7 + 10⁻¹ · 5)))</code></p>
+    
+    <h3>🔄 Алгоритм перевода дробной части</h3>
+    <p>Рассмотрим дробное число <code>0,a₁a₂a₃a₄</code>, записанное в системе с основанием <code>p</code>. Умножив это число на <code>p</code>, получаем <code>a₁,a₂a₃a₄</code>. Если взять целую часть результата, мы получим цифру <code>a₁</code>.</p>
+    <p>На каждом шаге умножаем дробную часть на <code>p</code> и запоминаем целую часть результата.</p>
+    
+    <div class="example">
+      ✨ <strong>Пример:</strong> Переведём <code>0,9376</code> в пятеричную систему:
+      <table>
+        <tr><th>Вычисления</th><th>Целая часть</th><th>Дробная часть</th></tr>
+        <tr><td>0,9376 · 5 = 4,688</td><td>4</td><td>0,688</td></tr>
+        <tr><td>0,688 · 5 = 3,44</td><td>3</td><td>0,44</td></tr>
+        <tr><td>0,44 · 5 = 2,2</td><td>2</td><td>0,2</td></tr>
+        <tr><td>0,2 · 5 = 1</td><td>1</td><td>0</td></tr>
+      </table>
+      <strong>Ответ: 0,9376₁₀ = 0,4321₅</strong>
+    </div>
+    
+    <div class="warning">
+      ⚠️ <strong>Важно:</strong> Не всегда дробь получается конечной! Например, <code>0,3</code> в пятеричной системе даст бесконечную дробь. В таких случаях задают нужное количество значащих цифр и округляют число.
+    </div>
+    
+    <div class="info">
+      🔀 <strong>Смешанные числа:</strong> Если есть целая и дробная части — переводим их отдельно и соединяем. Например: <code>25,375₁₀ = 100,14₅</code>.
+    </div>
+  </div>
+  
+  <div class="en">
+    <p>Negative positions are used for the fractional part:</p>
+    <p><code>0.6375 = 6·10⁻¹ + 3·10⁻² + 7·10⁻³ + 5·10⁻⁴</code></p>
+    <h3>🔄 Conversion Algorithm</h3>
+    <p>Multiply the fractional part by <code>p</code>, memorize the integer part. Repeat until zero.</p>
+    <div class="warning">⚠️ Not all fractions are finite! Round to required digits if needed.</div>
+  </div>
+  
+  <div class="es">
+    <p>Se usan posiciones negativas para la parte fraccionaria.</p>
+    <h3>🔄 Algoritmo de Conversión</h3>
+    <p>Multiplica la parte fraccionaria por <code>p</code>, memoriza la parte entera. Repite hasta 0.</p>
+  </div>
+  
+  <div class="de">
+    <p>Für den Bruchteil werden negative Stellen verwendet.</p>
+    <h3>🔄 Konvertierungsalgorithmus</h3>
+    <p>Multipliziere den Bruchteil mit <code>p</code>, merke den ganzzahligen Teil. Wiederhole bis 0.</p>
+  </div>
+</section>
+
+<!-- 🔄 ПЕРИОДИЧЕСКИЕ ДРОБИ -->
+<section id="periodic">
+  <h2><span class="ru">🔄 Периодические дроби</span><span class="en">🔄 Periodic Fractions</span><span class="es">🔄 Fracciones Periódicas</span><span class="de">🔄 Periodische Brüche</span></h2>
+  
+  <div class="ru">
+    <p>Не все дроби можно представить в виде конечных. Например, <code>1/3 = 0,(3)</code> — бесконечная периодическая дробь.</p>
+    <p>В десятичной системе счисления дробь является конечной тогда и только тогда, когда в разложении знаменателя на простые множители присутствуют только числа 2 и 5. Если в знаменателе есть другие простые делители (3, 7, 11 и т.д.), то дробь будет периодической.</p>
+    
+    <table>
+      <tr><th>Тип</th><th>Пример</th><th>Обоснование</th></tr>
+      <tr><td>✅ Конечная</td><td><code>1/4 = 0,25</code></td><td>4 = 2²</td></tr>
+      <tr><td>🔄 Периодическая</td><td><code>1/3 = 0,(3)</code></td><td>3 — простое, ≠ 2 и 5</td></tr>
+      <tr><td>🔄 Смешанная</td><td><code>1/6 = 0,1(6)</code></td><td>6 = 2·3</td></tr>
+      <tr><td>🔄 Длинный период</td><td><code>1/7 = 0,(142857)</code></td><td>7 — простое</td></tr>
+    </table>
+    
+    <h3>🎯 Способ 1: Умножение на pᵏ</h3>
+    <p>Для чисто периодической дроби <code>a = 0,(a₁a₂...aₖ)ₚ</code> умножаем на <code>pᵏ</code>:</p>
+    <p><code>a · pᵏ = a₁a₂...aₖ + a</code></p>
+    <p><code>a = a₁a₂...aₖ / (pᵏ − 1)</code></p>
+    
+    <div class="example">
+      ✨ <strong>Пример 24:</strong> <code>a = 0,(1001)₂</code>
+      <br><code>16·a = a + 1001₂</code>
+      <br><code>16·a = a + 9</code>
+      <br><code>a = 9/15 = 0,6₁₀</code>
+    </div>
+    
+    <p>При наличии непериодической части <code>b = 0,c₁c₂...cₙ(a₁a₂...aₖ)ₚ</code>:</p>
+    <p><code>b = a · p⁻ⁿ + 0,c₁c₂...cₙ</code></p>
+    
+    <div class="example">
+      ✨ <strong>Пример 25:</strong>
+      <br><code>0,10(1001)₂ = 2⁻² · 0,(1001)₂ + 0,1₂ = 0,25₁₀ · 0,6₁₀ + 0,5₁₀ = 0,15₁₀ + 0,5₁₀ = 0,65₁₀</code>
+    </div>
+    
+    <h3>🎯 Способ 2: Сумма геометрической прогрессии</h3>
+    <p><code>S = (p⁻ⁿ · a₁a₂...aₖ) / (1 − p⁻ᵏ) = a₁a₂...aₖ / (pⁿ · (pᵏ − 1))</code></p>
+    
+    <div class="example">
+      ✨ <strong>Пример 26:</strong> <code>0,10(1001)₂</code>
+      <br>Сумма прогрессии: <code>(2⁻² · 1001₂) / (1 − 2⁻⁴) = 2,25 / 0,9375 = 0,15</code>
+      <br>Прибавляем непериодическую часть: <code>0,1₂ = 0,5₁₀</code>
+      <br>Итого: <code>0,15 + 0,5 = 0,65₁₀</code>
+    </div>
+    
+    <div class="info">
+      💬 <strong>Какой способ выбрать?</strong>
+      <ul>
+        <li>Способ 1 — универсальный и проще для понимания 🎯</li>
+        <li>Способ 2 — эффективен для точного значения в виде обыкновенной дроби 🧮</li>
+      </ul>
+    </div>
+  </div>
+  
+  <div class="en">
+    <p>Not all fractions are finite. Example: <code>1/3 = 0.(3)</code>.</p>
+    <h3>🎯 Method 1: Multiply by pᵏ</h3>
+    <p><code>a = a₁a₂...aₖ / (pᵏ − 1)</code></p>
+    <h3>🎯 Method 2: Geometric Series</h3>
+    <p><code>S = a₁a₂...aₖ / (pⁿ · (pᵏ − 1))</code></p>
+  </div>
+  
+  <div class="es">
+    <p>No todas las fracciones son finitas. Ejemplo: <code>1/3 = 0,(3)</code>.</p>
+    <h3>🎯 Método 1: Multiplicar por pᵏ</h3>
+    <p><code>a = a₁a₂...aₖ / (pᵏ − 1)</code></p>
+  </div>
+  
+  <div class="de">
+    <p>Nicht alle Brüche sind endlich. Beispiel: <code>1/3 = 0,(3)</code>.</p>
+    <h3>🎯 Methode 1: Multiplikation mit pᵏ</h3>
+    <p><code>a = a₁a₂...aₖ / (pᵏ − 1)</code></p>
+  </div>
+</section>
+
+<!-- ⚖️ ТРОИЧНАЯ УРАВНОВЕШЕННАЯ -->
+<section id="balanced">
+  <h2><span class="ru">⚖️ Троичная уравновешенная система счисления</span><span class="en">⚖️ Balanced Ternary System</span><span class="es">⚖️ Sistema Ternario Equilibrado</span><span class="de">⚖️ Ausgewogenes Ternäres System</span></h2>
+  
+  <div class="ru">
+    <p>Это нестандартная позиционная система с основанием 3, где вместо цифр 0, 1, 2 используются симметричные значения: <strong>-1, 0, 1</strong> (часто обозначаются как <strong>T, 0, 1</strong> или <strong>-, 0, +</strong>).</p>
+    <div class="example">
+      💡 <strong>Пример:</strong> Число <code>1T0</code> (где T = -1):
+      <br><code>1T0₃ = 1·3² + (-1)·3¹ + 0·3⁰ = 9 - 3 + 0 = 6₁₀</code>
+    </div>
+    <h3>✨ Преимущества:</h3>
+    <ul>
+      <li>Не нужен отдельный знак «минус» для отрицательных чисел (например, <code>-6₁₀ = T10₃</code>).</li>
+      <li>Округление чисел совпадает с простым отбрасыванием младших разрядов.</li>
+      <li>Исторически использовалась в советской ЭВМ «Сетунь» (1959 г.).</li>
+    </ul>
+    <h3>🔄 Перевод в троичную уравновешенную:</h3>
+    <p>Сначала переводим число в обычную троичную систему, затем заменяем цифру 2 на <code>1T</code> (т.к. 2 = 3 - 1 = 1·3¹ + (-1)·3⁰) с переносом в следующий разряд.</p>
+    <div class="example">
+      ✨ <strong>Пример:</strong> <code>7₁₀ = 21₃ = 1T1₃</code> (т.к. 21₃ → заменяем 2 на 1T → 1·3² + (-1)·3¹ + 1·3⁰ = 9 - 3 + 1 = 7)
+    </div>
+  </div>
+  
+  <div class="en">
+    <p>A non-standard base-3 system using symmetric values: <strong>-1, 0, 1</strong> (denoted as <strong>T, 0, 1</strong>).</p>
+    <div class="example">💡 <code>1T0₃ = 1·9 + (-1)·3 + 0 = 6₁₀</code></div>
+    <h3>✨ Advantages:</h3>
+    <ul>
+      <li>No separate minus sign needed (e.g., <code>-6₁₀ = T10₃</code>).</li>
+      <li>Rounding equals truncation.</li>
+      <li>Used in Soviet "Setun" computer (1959).</li>
+    </ul>
+  </div>
+  
+  <div class="es">
+    <p>Sistema posicional no estándar de base 3 con valores simétricos: <strong>-1, 0, 1</strong> (<strong>T, 0, 1</strong>).</p>
+    <div class="example">💡 <code>1T0₃ = 1·9 + (-1)·3 + 0 = 6₁₀</code></div>
+    <h3>✨ Ventajas:</h3>
+    <ul>
+      <li>No se necesita signo "menos" (ej., <code>-6₁₀ = T10₃</code>).</li>
+      <li>Usado en la computadora soviética "Setun" (1959).</li>
+    </ul>
+  </div>
+  
+  <div class="de">
+    <p>Nicht-standardisiertes Basises-3-System mit symmetrischen Werten: <strong>-1, 0, 1</strong> (<strong>T, 0, 1</strong>).</p>
+    <div class="example">💡 <code>1T0₃ = 1·9 + (-1)·3 + 0 = 6₁₀</code></div>
+    <h3>✨ Vorteile:</h3>
+    <ul>
+      <li>Kein separates Minus-Zeichen (z.B. <code>-6₁₀ = T10₃</code>).</li>
+      <li>Verwendet im sowjetischen Computer "Setun" (1959).</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ❓ ВОПРОСЫ -->
+<section id="questions">
+  <h2><span class="ru">❓ Вопросы для самопроверки</span><span class="en">❓ Self-Check Questions</span><span class="es">❓ Preguntas</span><span class="de">❓ Fragen</span></h2>
+  
+  <div class="ru">
+    <h3>🔢 По целым числам</h3>
+    <ol>
+      <li>Какие системы счисления называют позиционными?</li>
+      <li>Каким термином называется количество цифр в алфавите позиционной системы счисления?</li>
+      <li>Что такое разряд? Как нумеруются разряды?</li>
+      <li>Как связаны в позиционной системе вес цифры и разряд, в котором она стоит?</li>
+      <li>Как вы думаете, почему в быту мы чаще всего используем десятичную систему?</li>
+      <li>Какие позиционные системы счисления используются сейчас на практике?</li>
+      <li>Чем хороша схема Горнера с точки зрения вычислений?</li>
+      <li>Как перевести число из любой позиционной системы в десятичную?</li>
+      <li>Какие цифры входят в алфавит девятеричной системы?</li>
+      <li>Как вы думаете, можно ли использовать систему счисления с основанием 1 000 000? В чём могут быть проблемы?</li>
+      <li>Сформулируйте алгоритм перевода числа из семеричной системы в десятичную.</li>
+      <li>Сформулируйте алгоритм перевода числа из десятичной системы в семеричную.</li>
+      <li>Как по записи числа в пятеричной системе сразу увидеть, делится ли оно на 5? На 25? На 125?</li>
+    </ol>
+    
+    <h3>🥧 По дробным числам</h3>
+    <ol start="14">
+      <li>Сформулируйте алгоритм перевода дробной части десятичного числа в шестеричную систему счисления.</li>
+      <li>Как вы думаете, почему не все конечные десятичные дроби можно представить в виде конечных дробей в других системах счисления?</li>
+      <li>Какие дробные десятичные числа можно записать в виде конечных дробей в шестеричной системе счисления? Ответ обоснуйте.</li>
+    </ol>
+    
+    <h3>🔄 По периодическим дробям</h3>
+    <ol start="17">
+      <li>Какие дроби называются периодическими?</li>
+      <li>В каком случае десятичная дробь является конечной, а в каком — периодической?</li>
+      <li>Опишите способ перевода чисто периодической P-ичной дроби в десятичную систему.</li>
+      <li>Как перевести смешанную периодическую дробь (с непериодической частью) в десятичную систему?</li>
+      <li>Какой способ перевода периодических дробей вы считаете более удобным и почему?</li>
+    </ol>
+  </div>
+  
+  <div class="en">
+    <h3>🔢 Integers</h3>
+    <ol>
+      <li>What are positional numeral systems?</li>
+      <li>What term describes the number of digits in an alphabet?</li>
+      <li>What is a position? How are positions numbered?</li>
+      <li>How are digit weight and position related?</li>
+      <li>Why do we mostly use the decimal system?</li>
+      <li>What positional systems are used in practice?</li>
+      <li>Why is Horner's scheme good for computations?</li>
+      <li>How to convert from any positional system to decimal?</li>
+      <li>What digits are in the base-9 alphabet?</li>
+      <li>Can we use base 1,000,000? What problems?</li>
+      <li>Formulate algorithm: base-7 to decimal.</li>
+      <li>Formulate algorithm: decimal to base-7.</li>
+      <li>How to see if a base-5 number is divisible by 5? 25? 125?</li>
+    </ol>
+    <h3>🥧 Fractions</h3>
+    <ol start="14">
+      <li>Formulate algorithm for fractional part to base-6.</li>
+      <li>Why can't all finite decimals be finite in other systems?</li>
+      <li>Which decimals are finite in base-6? Justify.</li>
+    </ol>
+    <h3>🔄 Periodic</h3>
+    <ol start="17">
+      <li>What are periodic fractions?</li>
+      <li>When is a decimal finite vs periodic?</li>
+      <li>Describe method for purely periodic P-ary to decimal.</li>
+      <li>How to convert mixed periodic fraction?</li>
+      <li>Which conversion method is more convenient and why?</li>
+    </ol>
+  </div>
+  
+  <div class="es">
+    <h3>🔢 Enteros</h3>
+    <ol>
+      <li>¿Qué son los sistemas posicionales?</li>
+      <li>¿Cómo se llama la cantidad de dígitos en un alfabeto?</li>
+      <li>¿Qué es una posición? ¿Cómo se numeran?</li>
+      <li>¿Cómo se relacionan peso y posición?</li>
+      <li>¿Por qué usamos el sistema decimal?</li>
+    </ol>
+  </div>
+  
+  <div class="de">
+    <h3>🔢 Ganze Zahlen</h3>
+    <ol>
+      <li>Was sind positionale Zahlensysteme?</li>
+      <li>Wie heißt die Anzahl der Ziffern im Alphabet?</li>
+      <li>Was ist eine Stelle? Wie werden Stellen nummeriert?</li>
+      <li>Wie hängen Zifferngewicht und Stelle zusammen?</li>
+      <li>Warum verwenden wir das Dezimalsystem?</li>
+    </ol>
+  </div>
+</section>
+
+<!-- 🏆 ЗАДАЧИ -->
+<section id="tasks">
+  <h2><span class="ru">🏆 Задачи</span><span class="en">🏆 Tasks</span><span class="es">🏆 Tareas</span><span class="de">🏆 Aufgaben</span></h2>
+  
+  <div class="ru">
+    <h3 id="tasks-int">🔢 Задачи по целым числам</h3>
+    <div class="task"><strong>1️⃣ Запишите 12345 в развёрнутой форме и в виде схемы Горнера.</strong><div class="solution">Развёрнутая: <code>1·10⁴ + 2·10³ + 3·10² + 4·10¹ + 5·10⁰</code><br>Схема Горнера: <code>(((1·10 + 2)·10 + 3)·10 + 4)·10 + 5</code></div></div>
+    <div class="task"><strong>2️⃣ Минимальное основание системы, чтобы существовали 123, 463, 153, 455?</strong><div class="solution">Самая большая цифра в записях — 6. Значит, минимальное основание <strong>7</strong>.</div></div>
+    <div class="task"><strong>3️⃣ Выберите наибольшее число:</strong> 11₂, 11₇, 11₈, 11₁₂, 11₁₆, 11₂₅.<div class="solution">Все числа имеют одинаковую запись <code>11</code>, но разное основание. Чем больше основание, тем больше значение. Ответ: <code>11₂₅ = 26₁₀</code>.</div></div>
+    <div class="task"><strong>4️⃣ Переведите в десятичную:</strong> 345₈, 345₇, 345ₓ.<div class="solution"><code>345₈ = 3·64 + 4·8 + 5 = 229</code><br><code>345₇ = 3·49 + 4·7 + 5 = 180</code><br><code>345ₓ = 3x² + 4x + 5</code> (при x > 5)</div></div>
+    <div class="task"><strong>5️⃣ Переведите 194 в троичную, четверичную, семеричную и восьмеричную системы.</strong><div class="solution"><code>194₁₀ = 21012₃</code><br><code>194₁₀ = 3002₄</code><br><code>194₁₀ = 365₇</code><br><code>194₁₀ = 302₈</code></div></div>
+    <div class="task"><strong>6️⃣ Какие из чисел 1230₄, 124₇, 600₈, 530₆ делятся на 7? На 49?</strong><div class="solution"><code>1230₄ = 108</code> (не делится на 7)<br><code>124₇ = 67</code> (не делится)<br><code>600₈ = 384</code> (не делится)<br><code>530₆ = 198</code> (не делится)</div></div>
+    <div class="task"><strong>7️⃣ Десятичное число в 8-ричной и 9-ричной системах оканчивается на 0. Минимальное такое число?</strong><div class="solution">Число должно делиться и на 8, и на 9. НОК(8,9) = <strong>72</strong>.</div></div>
+    <div class="task"><strong>8️⃣ Сколько раз встречается цифра 2 в числах 10, 11, ..., 17 в 5-ричной системе?</strong><div class="solution"><code>10=20₅, 11=21₅, 12=22₅, 13=23₅, 14=24₅, 15=30₅, 16=31₅, 17=32₅</code><br>Цифра 2 встречается: 1+1+2+1+1+0+0+1 = <strong>7 раз</strong>.</div></div>
+    <div class="task"><strong>9️⃣ В системе с основанием x число 12 записывается как 110ₓ. Найдите x.</strong><div class="solution"><code>12 = x² + x</code> → <code>x² + x − 12 = 0</code> → <code>(x+4)(x−3) = 0</code> → <strong>x = 3</strong></div></div>
+    <div class="task"><strong>🔟 Найдите все основания, в которых запись числа 29 оканчивается на 5.</strong><div class="solution"><code>29 mod p = 5</code>, т.е. 24 делится на p, p > 5. Делители 24: <strong>6, 8, 12, 24</strong>.</div></div>
+    <div class="task"><strong>1️⃣1️⃣ Десятичное 129 = 1004ₙ. Найдите n.</strong><div class="solution"><code>129 = n³ + 4</code> → <code>n³ = 125</code> → <strong>n = 5</strong></div></div>
+    <div class="task"><strong>1️⃣2️⃣ 30 = 110ₙ. Найдите n.</strong><div class="solution"><code>30 = n² + n</code> → <code>(n−5)(n+6) = 0</code> → <strong>n = 5</strong></div></div>
+    <div class="task"><strong>1️⃣3️⃣ 23 = 212ₙ. Найдите n.</strong><div class="solution"><code>23 = 2n² + n + 2</code> → <code>2n² + n − 21 = 0</code> → <code>D = 169</code> → <strong>n = 3</strong></div></div>
+    <div class="task"><strong>1️⃣4️⃣ 210 = 313ₙ. Найдите n.</strong><div class="solution"><code>210 = 3n² + n + 3</code> → <code>3n² + n − 207 = 0</code>. D = 2485 — не корень. Возможна опечатка.</div></div>
+    <div class="task"><strong>1️⃣5️⃣ 65 = 311ₙ. Найдите n.</strong><div class="solution"><code>65 = 3n² + n + 1</code> → <code>3n² + n − 64 = 0</code>. D = 769 — не корень. Возможна опечатка.</div></div>
+    <div class="task"><strong>1️⃣6️⃣ Найдите все десятичные числа ≤ 25, запись которых в двоичной оканчивается на 101.</strong><div class="solution">Оканчиваются на <code>101₂ = 5₁₀</code>. Числа вида <code>8k + 5</code>: <strong>5, 13, 21</strong>.</div></div>
+    <div class="task"><strong>1️⃣7️⃣ 67 в системе с основанием n оканчивается на 1 и содержит 4 цифры. Найдите n.</strong><div class="solution"><code>67 mod n = 1</code>, n делит 66. Четыре цифры: <code>n³ ≤ 67 < n⁴</code>. <code>n = 3</code>: <code>67 = 2111₃</code> ✓. Ответ: <strong>n = 3</strong>.</div></div>
+    <div class="task"><strong>1️⃣8️⃣ Найдите все основания, в которых запись числа 30 оканчивается на 8.</strong><div class="solution"><code>30 mod p = 8</code>, p делит 22, p > 8. Ответ: <strong>11, 22</strong>.</div></div>
+    <div class="task"><strong>1️⃣9️⃣ Найдите все основания, в которых запись числа 31 оканчивается на 11.</strong><div class="solution"><code>31 mod p² = p + 1</code>. <code>p=3</code>: 27 дел. на 9 ✓. Ответ: <strong>p = 3</strong> (<code>31 = 1011₃</code>).</div></div>
+    <div class="task"><strong>2️⃣0️⃣ Найдите все основания, в которых запись 63 оканчивается на 23.</strong><div class="solution"><code>63 mod p² = 2p + 3</code>. <code>p=5</code>: 50/25 = 2 ✓. Ответ: <strong>p = 5</strong>.</div></div>
+    <div class="task"><strong>2️⃣1️⃣ Наименьшее основание, в котором 30 — трёхзначно.</strong><div class="solution"><code>p² ≤ 30 < p³</code>. <code>p = 4</code>: 16 ≤ 30 < 64 ✓. Ответ: <strong>4</strong>.</div></div>
+    <div class="task"><strong>2️⃣2️⃣ Наименьшее основание, в котором 70 — трёхзначно.</strong><div class="solution"><code>p² ≤ 70 < p³</code>. <code>p = 5</code>: 25 ≤ 70 < 125 ✓. Ответ: <strong>5</strong>.</div></div>
+    <div class="task"><strong>2️⃣3️⃣ Все числа ≤ 26, запись которых в троичной оканчивается на 22.</strong><div class="solution">Оканчиваются на <code>22₃ = 8₁₀</code>. Числа вида <code>9k + 8</code>: <strong>8, 17, 26</strong>.</div></div>
+    <div class="task"><strong>2️⃣4️⃣ Все числа ≤ 30, запись которых в четверичной оканчивается на 31.</strong><div class="solution"><code>31₄ = 13₁₀</code>. Числа вида <code>16k + 13</code>: <strong>13, 29</strong>.</div></div>
+    <div class="task"><strong>2️⃣5️⃣ Все числа ≤ 25, запись которых в 6-ричной начинается на 4.</strong><div class="solution">От <code>4·6 = 24</code> до <code>29</code>. В пределах ≤ 25: <strong>24, 25</strong>.</div></div>
+    <div class="task"><strong>2️⃣6️⃣ Все числа ≤ 30, запись которых в 5-ричной начинается на 3.</strong><div class="solution">От <code>3·5 = 15</code> до <code>19</code>. Ответ: <strong>15, 16, 17, 18, 19</strong>.</div></div>
+    <div class="task"><strong>2️⃣7️⃣ Решите уравнения:</strong> а) 32ₓ + 64ₓ = 106ₓ; б) 45ₓ + 55ₓ = 122ₓ; в) 42ₓ + 41ₓ = 133ₓ; г) 91ₓ + 93ₓ = 154ₓ.<div class="solution">а) <code>x² − 9x = 0</code> → <strong>x = 9</strong><br>б) <code>x² − 7x − 8 = 0</code> → <strong>x = 8</strong><br>в) <code>x² − 5x = 0</code> → <strong>x = 5</strong><br>г) <code>x² − 13x = 0</code> → <strong>x = 13</strong></div></div>
+    <div class="task"><strong>2️⃣8️⃣ 🅰️ Все 5-буквенные слова из А, О, У в алфавитном порядке.</strong> а) количество; б) слова на 101, 125, 170, 210 местах; в) номера слов АОАОО, УАУАУ, АООАО, УОООУ; г) первое и последнее слова на О.<div class="solution">Троичная система (А=0, О=1, У=2).<br>а) <code>3⁵ = 243</code><br>б) 101-е = <code>01021₃ = АОУАО</code>, 125-е = <code>11121₃ = ОООУО</code>, 170-е = <code>20021₃ = УААУО</code>, 210-е = <code>21202₃ = УОУАО</code><br>в) АОАОО = 32-е, УАУАУ = 183-е, АООАО = 38-е, УОООУ = 204-е<br>г) Первое на О: <strong>ОАААА (82-е)</strong>, последнее: <strong>ОУУУУ (163-е)</strong></div></div>
+    <div class="task"><strong>2️⃣9️⃣ 🅱️ Все 5-буквенные слова из А, К, Р, С, У. Те же задания.</strong><div class="solution">5-ричная система (А=0, К=1, Р=2, С=3, У=4).<br>а) <code>5⁵ = 3125</code> слов<br>г) Первое на Р: <strong>РАААА</strong>, последнее: <strong>РУУУУ</strong></div></div>
+    
+    <h3 id="tasks-frac">🥧 Задачи по дробным числам</h3>
+    <div class="task"><strong>1️⃣ Запишите 0,12321 в развёрнутой форме и схеме Горнера.</strong><div class="solution">Развёрнутая: <code>1·10⁻¹ + 2·10⁻² + 3·10⁻³ + 2·10⁻⁴ + 1·10⁻⁵</code><br>Горнер: <code>10⁻¹·(1 + 10⁻¹·(2 + 10⁻¹·(3 + 10⁻¹·(2 + 10⁻¹·1))))</code></div></div>
+    <div class="task"><strong>2️⃣ Переведите 15,125 в двоичную, четверичную, шестеричную и восьмеричную.</strong><div class="solution"><code>15,125₁₀ = 1111,001₂</code><br><code>15,125₁₀ = 33,02₄</code><br><code>15,125₁₀ = 23,04253...₆</code> (периодическая)<br><code>15,125₁₀ = 17,1₈</code></div></div>
+    <div class="task"><strong>3️⃣ Какие из чисел больше 1/2:</strong> 0,011₂; 0,123₄; 0,214₅; 0,225₆; 0,25₈; 0,35₈; 0,35₆?<div class="solution">Все меньше 0,5, кроме <code>0,35₆ ≈ 0,638 > 0,5 ✓</code>. Ответ: <strong>только 0,35₆</strong>.</div></div>
+    <div class="task"><strong>4️⃣ Переведите в 4-ричную:</strong> 11,125; 15,75; 22,6875; 0,375.<div class="solution"><code>11,125₁₀ = 23,02₄</code><br><code>15,75₁₀ = 33,3₄</code><br><code>22,6875₁₀ = 112,23₄</code><br><code>0,375₁₀ = 0,12₄</code></div></div>
+    
+    <h3 id="tasks-per">🔄 Задачи по периодическим дробям</h3>
+    <div class="task"><strong>1️⃣ Переведите в десятичную:</strong> а) 0,(1)₂; б) 0,(10)₂; в) 0,(101)₂; г) 0,1(01)₂.<div class="solution">а) <code>1/1 = 1</code><br>б) <code>2/3</code><br>в) <code>5/7</code><br>г) <code>2/3</code></div></div>
+    <div class="task"><strong>2️⃣ Переведите в десятичную:</strong> а) 0,(1)₃; б) 0,(2)₃; в) 0,(12)₃; г) 0,1(2)₃.<div class="solution">а) <code>1/2</code><br>б) <code>1</code><br>в) <code>5/8</code><br>г) <code>2/3</code></div></div>
+    <div class="task"><strong>3️⃣ Переведите в десятичную:</strong> а) 0,(3)₅; б) 0,(14)₅; в) 0,2(3)₅; г) 0,1(24)₅.<div class="solution">а) <code>3/4</code><br>б) <code>3/8</code><br>в) <code>11/20</code><br>г) <code>19/60</code></div></div>
+    <div class="task"><strong>4️⃣ Переведите в десятичную:</strong> а) 0,(3)₁₆; б) 0,(A)₁₆; в) 0,(1F)₁₆; г) 0,1(A)₁₆.<div class="solution">а) <code>1/5</code><br>б) <code>2/3</code><br>в) <code>31/255</code><br>г) <code>5/48</code></div></div>
+    <div class="task"><strong>5️⃣ Представьте в виде обыкновенной дроби:</strong> а) 0,(3); б) 0,(6); в) 0,(142857); г) 0,1(6); д) 0,1(428571).<div class="solution">а) <code>1/3</code><br>б) <code>2/3</code><br>в) <code>1/7</code><br>г) <code>1/6</code><br>д) <code>1/7</code></div></div>
+    <div class="task"><strong>6️⃣ Конечные или периодические:</strong> 1/7, 1/8, 1/9, 1/11, 1/12, 1/13.<div class="solution"><code>1/7 = 0,(142857)</code> — периодическая<br><code>1/8 = 0,125</code> — конечная<br><code>1/9 = 0,(1)</code> — периодическая<br><code>1/11 = 0,(09)</code> — периодическая<br><code>1/12 = 0,08(3)</code> — периодическая<br><code>1/13 = 0,(076923)</code> — периодическая</div></div>
+    <div class="task"><strong>7️⃣ Найдите длину периода для:</strong> 1/7, 1/13, 1/17, 1/19.<div class="solution"><code>1/7</code> — период 6<br><code>1/13</code> — период 6<br><code>1/17</code> — период 16<br><code>1/19</code> — период 18</div></div>
+    <div class="task"><strong>8️⃣ 🌟 Докажите, что 0,(9) = 1.</strong><div class="solution"><strong>Способ 1:</strong> <code>x = 0,(9)</code> → <code>10x = 9 + x</code> → <code>x = 1</code> ✓<br><strong>Способ 2:</strong> <code>(9/10)/(1−1/10) = 1</code> ✓<br><strong>Способ 3:</strong> <code>9/(10−1) = 1</code> ✓</div></div>
+  </div>
+  
+  <div class="en">
+    <p><em>See the Russian version for all 41 tasks with detailed solutions.</em></p>
+    <ul>
+      <li>Tasks 1-29: Integers (conversions, equations, combinatorics)</li>
+      <li>Tasks 1-4: Fractions</li>
+      <li>Tasks 1-8: Periodic fractions (incl. proof 0.(9)=1)</li>
+    </ul>
+  </div>
+  
+  <div class="es"><p><em>Consulta la versión en ruso para las 41 tareas con soluciones.</em></p></div>
+  <div class="de"><p><em>Siehe die russische Version für alle 41 Aufgaben mit Lösungen.</em></p></div>
+</section>
+
+<footer>
+  <p>
+    <span class="ru">🎓 Учи играючи! © 2026 Учебная платформа по информатике</span>
+    <span class="en">🎓 Learn while playing! © 2026 CS Learning Platform</span>
+    <span class="es">🎓 ¡Aprende jugando! © 2026 Plataforma de Informática</span>
+    <span class="de">🎓 Lerne spielend! © 2026 Informatik-Lernplattform</span>
+  </p>
+  <p style="margin-top: 10px; opacity: 0.8;">
+    <span class="ru">Сделано с ❤️ для учеников</span>
+    <span class="en">Made with ❤️ for students</span>
+    <span class="es">Hecho con ❤️ para estudiantes</span>
+    <span class="de">Mit ❤️ für Schüler gemacht</span>
+  </p>
+</footer>
+
+</div>
+
+<script>
+  const langButtons = document.querySelectorAll('.lang-btn');
+  const savedLang = localStorage.getItem('siteLang') || 'ru';
+  
+  function setLanguage(lang) {
+    document.body.className = '';
+    if (lang !== 'ru') {
+      document.body.classList.add('is-' + lang);
+    }
+    document.documentElement.lang = lang;
+    localStorage.setItem('siteLang', lang);
+    
+    langButtons.forEach(btn => {
+      btn.classList.remove('active');
+      if (btn.dataset.lang === lang) {
+        btn.classList.add('active');
+      }
+    });
+  }
+  
+  setLanguage(savedLang);
+  
+  langButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      setLanguage(btn.dataset.lang);
+    });
+  });
+</script>
+
+</body>
+</html>
