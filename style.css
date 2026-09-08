@@ -1,0 +1,665 @@
+/* ===== Переменные ===== */
+:root {
+    --pink: #ff6b9d;
+    --purple: #c44dff;
+    --blue: #4d79ff;
+    --cyan: #00d4ff;
+    --green: #00e676;
+    --yellow: #ffeb3b;
+    --orange: #ff9100;
+    --red: #ff1744;
+    --bg-dark: #0a0e27;
+    --bg-card: rgba(255, 255, 255, 0.05);
+    --text: #ffffff;
+    --text-muted: #b8c1ec;
+    --radius: 20px;
+    --shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== Переключатель языков ===== */
+.lang-switcher {
+    display: flex;
+    gap: 3px;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 4px;
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+[data-i18n] {
+    transition: opacity 0.2s ease;
+}
+
+.lang-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.8em;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: 'Nunito', sans-serif;
+    white-space: nowrap;
+}
+
+.lang-btn:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.lang-btn.active {
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    color: white;
+    box-shadow: 0 4px 12px rgba(196, 77, 255, 0.4);
+}
+
+/* ===== Reset ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(135deg, #0a0e27 0%, #1a1f4e 50%, #2d1b69 100%);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* ===== Плавающие эмодзи ===== */
+.floating-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.float-item {
+    position: absolute;
+    bottom: -100px;
+    left: var(--x);
+    font-size: 2em;
+    opacity: 0.15;
+    animation: floatUp 15s linear infinite;
+    animation-delay: var(--delay);
+}
+
+@keyframes floatUp {
+    0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.15; }
+    90% { opacity: 0.15; }
+    100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
+}
+
+/* ===== Navbar ===== */
+.navbar {
+    background: rgba(10, 14, 39, 0.8);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 15px 0;
+}
+
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.logo {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.8em;
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-decoration: none;
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.nav-menu a {
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 30px;
+    transition: var(--transition);
+    font-weight: 700;
+}
+
+.nav-menu a:hover, .nav-menu a.active {
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* ===== Hero ===== */
+.hero {
+    padding: 100px 0 80px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.hero-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--orange), var(--red));
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 0.9em;
+    margin-bottom: 20px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.hero-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 4em;
+    line-height: 1.1;
+    margin-bottom: 20px;
+}
+
+.title-line {
+    display: block;
+}
+
+.title-line.highlight {
+    background: linear-gradient(135deg, var(--yellow), var(--orange), var(--pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: rainbow 3s ease infinite;
+    background-size: 200% 200%;
+}
+
+@keyframes rainbow {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.hero-subtitle {
+    font-size: 1.4em;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 auto 40px;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* ===== Кнопки ===== */
+.btn {
+    padding: 16px 32px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.1em;
+    transition: var(--transition);
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    color: white;
+    box-shadow: 0 10px 30px rgba(196, 77, 255, 0.4);
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 15px 40px rgba(196, 77, 255, 0.6);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-3px);
+}
+
+.btn-bounce {
+    animation: bounce 2s ease infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* ===== Scroll indicator ===== */
+.scroll-indicator {
+    margin-top: 60px;
+    color: var(--text-muted);
+    font-size: 0.9em;
+    animation: fadeInOut 2s ease infinite;
+}
+
+.scroll-indicator .arrow {
+    font-size: 1.5em;
+    margin-top: 10px;
+    animation: bounce 1s ease infinite;
+}
+
+@keyframes fadeInOut {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* ===== Sections ===== */
+section {
+    padding: 80px 0;
+    position: relative;
+    z-index: 1;
+}
+
+.section-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 2.8em;
+    text-align: center;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.section-title .emoji {
+    font-size: 0.8em;
+    animation: wiggle 2s ease infinite;
+}
+
+@keyframes wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-10deg); }
+    75% { transform: rotate(10deg); }
+}
+
+.section-subtitle {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 1.2em;
+    margin-bottom: 50px;
+}
+
+/* ===== Карточки ===== */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+.fun-card {
+    position: relative;
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 30px;
+    text-decoration: none;
+    color: var(--text);
+    transition: var(--transition);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    display: block;
+    z-index: 1;
+    pointer-events: auto !important;
+}
+
+.fun-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.05));
+    opacity: 0;
+    transition: var(--transition);
+    pointer-events: none !important;
+    z-index: -1;
+}
+
+.featured-badge, .card-arrow, .card-sparkles {
+    pointer-events: none !important;
+}
+
+.fun-card:hover {
+    transform: translateY(-10px) rotate(-1deg);
+    border-color: var(--primary-color, var(--purple));
+    box-shadow: var(--shadow);
+}
+
+.fun-card:hover::before {
+    opacity: 1;
+}
+
+.card-games { --primary-color: var(--pink); }
+.card-course { --primary-color: var(--purple); }
+.card-trainers { --primary-color: var(--cyan); }
+.card-help { --primary-color: var(--green); }
+
+.featured {
+    background: linear-gradient(135deg, rgba(196, 77, 255, 0.2), rgba(77, 121, 255, 0.2));
+    border-color: var(--purple);
+    transform: scale(1.02);
+}
+
+.featured:hover {
+    transform: translateY(-10px) scale(1.04) rotate(-1deg);
+}
+
+.featured-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: linear-gradient(135deg, var(--yellow), var(--orange));
+    color: #000;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: 700;
+}
+
+.card-emoji {
+    font-size: 4em;
+    margin-bottom: 15px;
+    display: inline-block;
+    transition: var(--transition);
+}
+
+.fun-card:hover .card-emoji {
+    transform: scale(1.2) rotate(10deg);
+}
+
+.card-content h3 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.5em;
+    margin-bottom: 10px;
+    color: var(--primary-color, white);
+}
+
+.card-content p {
+    color: var(--text-muted);
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    color: var(--text-muted);
+}
+
+.card-arrow {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    font-size: 2em;
+    color: var(--primary-color, white);
+    transition: var(--transition);
+}
+
+.fun-card:hover .card-arrow {
+    transform: translateX(10px);
+}
+
+.card-sparkles {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 1em;
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.fun-card:hover .card-sparkles {
+    opacity: 1;
+    animation: sparkle 1s ease infinite;
+}
+
+@keyframes sparkle {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.2); }
+}
+
+/* ===== Статистика ===== */
+.stats-section {
+    background: linear-gradient(135deg, rgba(196, 77, 255, 0.1), rgba(77, 121, 255, 0.1));
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    padding: 30px;
+    border-radius: var(--radius);
+    text-align: center;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    transition: var(--transition);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--purple);
+}
+
+.stat-number {
+    font-family: 'Fredoka One', cursive;
+    font-size: 3em;
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.stat-label {
+    color: var(--text-muted);
+    font-size: 1.1em;
+    margin-top: 10px;
+}
+
+/* ===== Features ===== */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 25px;
+}
+
+.feature {
+    background: var(--bg-card);
+    padding: 30px;
+    border-radius: var(--radius);
+    text-align: center;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    transition: var(--transition);
+}
+
+.feature:hover {
+    transform: translateY(-5px);
+    border-color: var(--cyan);
+}
+
+.feature-icon {
+    font-size: 3em;
+    margin-bottom: 15px;
+}
+
+.feature h4 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.3em;
+    margin-bottom: 10px;
+    color: var(--cyan);
+}
+
+.feature p {
+    color: var(--text-muted);
+}
+
+/* ===== CTA ===== */
+.cta-section {
+    padding: 60px 0;
+}
+
+.cta-box {
+    background: linear-gradient(135deg, var(--pink), var(--purple), var(--blue));
+    padding: 60px 40px;
+    border-radius: var(--radius);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-box::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+    animation: moveGrid 20s linear infinite;
+}
+
+@keyframes moveGrid {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(20px, 20px); }
+}
+
+.cta-box h2 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 2.5em;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.cta-box p {
+    font-size: 1.2em;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.cta-box .btn {
+    background: white;
+    color: var(--purple);
+    position: relative;
+}
+
+.cta-box .btn:hover {
+    background: var(--yellow);
+}
+
+/* ===== Footer ===== */
+footer {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 40px 0;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 1;
+}
+
+.footer-logo {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.5em;
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+}
+
+.footer-tagline {
+    color: var(--text-muted);
+    margin-top: 10px;
+    font-style: italic;
+}
+
+/* ===== Конфетти ===== */
+#confetti-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    top: -10px;
+    animation: confettiFall 3s linear forwards;
+}
+
+@keyframes confettiFall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .hero-title { font-size: 2.5em; }
+    .section-title { font-size: 2em; }
+    .cards-grid { grid-template-columns: 1fr; }
+    .featured { transform: none; }
+    .featured:hover { transform: translateY(-10px); }
+    .lang-btn { padding: 4px 7px; font-size: 0.7em; }
+    .navbar .container { flex-direction: column; }
+    .nav-menu { justify-content: center; }
+}
