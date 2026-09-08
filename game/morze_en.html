@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link rel="icon" type="image/png" href="../favicon.png"> 
+<title>Азбука Морзе · Информатика</title>
+<style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: linear-gradient(145deg, #1a2634 0%, #0c141f 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      padding: 16px;
+      margin: 0;
+      color: #eef3fc;
+    }
+
+    .game-card {
+      max-width: 900px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 56px;
+      padding: 30px 26px 38px;
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.7), inset 0 1px 2px rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.02);
+      transition: all 0.2s;
+      position: relative;
+      margin: 20px 0;
+    }
+
+    .back-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: #2f4a62;
+      border: 1px solid #4d6b87;
+      padding: 8px 18px;
+      border-radius: 40px;
+      color: #eef4fc;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: 0.15s;
+      box-shadow: 0 5px 0 #152433;
+      z-index: 10;
+    }
+    .back-btn:hover {
+      background: #3d5a75;
+      transform: translateX(-3px);
+    }
+    .back-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #152433;
+    }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 6px;
+      padding-left: 110px;
+    }
+
+    h1 {
+      font-weight: 500;
+      font-size: 2rem;
+      letter-spacing: 1px;
+      color: #eef3fc;
+      text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    h1 small {
+      font-size: 1rem;
+      font-weight: 400;
+      opacity: 0.7;
+      background: #26384b;
+      padding: 4px 16px;
+      border-radius: 60px;
+      letter-spacing: 0.3px;
+    }
+
+    .lang-selector {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .lang-btn {
+      background: #26384b;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #b6cbe0;
+      cursor: pointer;
+      transition: 0.2s;
+      border: 1px solid #3d536b;
+      letter-spacing: 0.3px;
+    }
+    .lang-btn.active {
+      background: #f6c343;
+      color: #1a2634;
+      border-color: #fad67a;
+      box-shadow: 0 0 12px rgba(246, 195, 67, 0.3);
+    }
+    .lang-btn:hover {
+      background: #3d536b;
+      color: #f0f5ff;
+    }
+    .lang-btn.active:hover {
+      background: #fad05a;
+    }
+
+    /* Tabs */
+    .tabs-nav {
+      display: flex;
+      gap: 12px;
+      margin: 18px 0 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .tab-btn {
+      background: #26384b;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #b6cbe0;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 6px 0 #0f1a26;
+      letter-spacing: 0.5px;
+      flex: 1 1 150px;
+      border: 1px solid #3d536b;
+    }
+    .tab-btn.active {
+      background: #f6c343;
+      color: #1a2634;
+      box-shadow: 0 6px 0 #a57d2a;
+      border-color: #fad67a;
+      transform: scale(1.02);
+    }
+    .tab-btn:hover {
+      background: #3d536b;
+      color: #f0f5ff;
+    }
+    .tab-btn.active:hover {
+      background: #fad05a;
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      background: #13202e;
+      border-radius: 48px;
+      padding: 28px 22px;
+      margin: 10px 0 20px;
+      box-shadow: inset 0 8px 12px rgba(0,0,0,0.5), 0 4px 8px rgba(0,0,0,0.3);
+      border: 1px solid #314a60;
+    }
+
+    .card h2 {
+      margin: 0 0 20px 0;
+      font-size: 1.5rem;
+      color: #f0f6ff;
+      text-align: center;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #b6cbe0;
+      font-size: 0.95rem;
+      letter-spacing: 0.3px;
+    }
+
+    textarea, input[type="text"] {
+      width: 100%;
+      padding: 14px 20px;
+      background: #0c1723;
+      border: 2px solid #2f4a62;
+      border-radius: 40px;
+      font-size: 1.1rem;
+      color: #f0f6ff;
+      font-family: 'Courier New', monospace;
+      outline: none;
+      transition: 0.2s;
+      box-shadow: inset 0 4px 6px rgba(0,0,0,0.6);
+      box-sizing: border-box;
+    }
+    textarea:focus, input[type="text"]:focus {
+      border-color: #f6c343;
+      background: #101f2e;
+      box-shadow: 0 0 0 3px rgba(246, 195, 67, 0.3);
+    }
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+      border-radius: 24px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 14px;
+      margin: 16px 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn {
+      background: #2f4a62;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: #eef4fc;
+      cursor: pointer;
+      transition: 0.15s;
+      box-shadow: 0 7px 0 #152433;
+      border: 1px solid #4d6b87;
+      flex: 1 1 120px;
+      letter-spacing: 0.5px;
+    }
+    .btn-primary {
+      background: #f6c343;
+      color: #1f2d3d;
+      box-shadow: 0 7px 0 #9f7d2b;
+      border-color: #fad87a;
+      font-weight: 700;
+    }
+    .btn-primary:hover {
+      background: #fdda5a;
+      transform: scale(1.02);
+    }
+    .btn-primary:active {
+      transform: translateY(4px);
+      box-shadow: 0 3px 0 #9f7d2b;
+    }
+    .btn-secondary {
+      background: #3c5772;
+      box-shadow: 0 7px 0 #1d3142;
+      border-color: #5a7a9a;
+    }
+    .btn-secondary:hover {
+      background: #4d6d8c;
+    }
+    .btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 3px 0 #152433;
+    }
+
+    .settings {
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid #29415a;
+    }
+
+    .setting-item {
+      margin-bottom: 15px;
+    }
+
+    .setting-item label {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #b6cbe0;
+    }
+    .setting-item label span {
+      color: #f6c343;
+      font-weight: 700;
+    }
+
+    .setting-item input[type="range"] {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: #1b2d3f;
+      outline: none;
+      -webkit-appearance: none;
+      border: 1px solid #314a60;
+    }
+    .setting-item input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #f6c343;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      border: 2px solid #fad87a;
+    }
+    .setting-item input[type="range"]::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #f6c343;
+      cursor: pointer;
+      border: 2px solid #fad87a;
+    }
+
+    .visual-output {
+      font-size: 1.8rem;
+      letter-spacing: 6px;
+      min-height: 70px;
+      padding: 20px;
+      background: #0c1723;
+      border-radius: 24px;
+      border: 2px solid #2f4a62;
+      font-family: 'Courier New', monospace;
+      word-wrap: break-word;
+      line-height: 1.8;
+      color: #f6c343;
+      font-weight: 600;
+      box-shadow: inset 0 4px 6px rgba(0,0,0,0.6);
+    }
+
+    .mouse-input-area {
+      text-align: center;
+      padding: 30px 20px;
+      background: #0c1723;
+      border-radius: 32px;
+      border: 2px solid #2f4a62;
+      margin: 20px 0;
+      box-shadow: inset 0 4px 6px rgba(0,0,0,0.6);
+    }
+
+    .hold-btn {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      font-size: 1.1rem;
+      font-weight: bold;
+      background: #f6c343;
+      color: #1a2634;
+      margin: 20px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      cursor: pointer;
+      box-shadow: 0 10px 0 #9f7d2b, 0 15px 30px rgba(0, 0, 0, 0.4);
+      transition: all 0.1s;
+      border: 4px solid #fad87a;
+      letter-spacing: 1px;
+    }
+    .hold-btn:active {
+      background: #fad05a;
+      transform: translateY(6px);
+      box-shadow: 0 4px 0 #9f7d2b, 0 8px 15px rgba(0, 0, 0, 0.4);
+    }
+
+    .mouse-display {
+      font-size: 2rem;
+      letter-spacing: 8px;
+      min-height: 50px;
+      margin: 20px 0;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      color: #f6c343;
+    }
+
+    .instructions {
+      background: #1b2d3f;
+      border-left: 4px solid #f6c343;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+    }
+    .instructions p {
+      margin: 5px 0;
+      color: #b6cbe0;
+      font-size: 0.95rem;
+    }
+    .instructions strong {
+      color: #f6c343;
+    }
+
+    .alphabet-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+    }
+
+    .alphabet-card {
+      background: #1b2d3f;
+      padding: 20px;
+      border-radius: 24px;
+      border: 1px solid #314a60;
+    }
+    .alphabet-card h3 {
+      margin: 0 0 12px 0;
+      color: #f6c343;
+      font-size: 1.15rem;
+      border-bottom: 2px solid #314a60;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+    }
+    .alphabet-card p {
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      margin: 6px 0;
+      line-height: 1.8;
+      color: #eef3fc;
+    }
+
+    .decoded-output {
+      font-size: 1.6rem;
+      min-height: 60px;
+      padding: 20px;
+      background: #0c1723;
+      border-radius: 24px;
+      border: 2px solid #2f4a62;
+      color: #f6c343;
+      font-weight: 600;
+      margin-top: 15px;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 2px;
+      box-shadow: inset 0 4px 6px rgba(0,0,0,0.6);
+      word-wrap: break-word;
+    }
+
+    .score-area {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 18px;
+      padding: 8px 8px 0;
+      color: #b6cbe0;
+      font-weight: 400;
+      border-top: 1px solid #29415a;
+      padding-top: 18px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .score-badge {
+      background: #1b2d3f;
+      padding: 6px 18px;
+      border-radius: 40px;
+      font-size: 1rem;
+    }
+    .score-badge span {
+      font-weight: 700;
+      color: #f6c343;
+      margin: 0 4px;
+    }
+
+    @media (max-width: 768px) {
+      .game-card { padding: 20px 14px; border-radius: 40px; }
+      .header-row { flex-direction: column; align-items: stretch; padding-left: 0; padding-top: 50px; }
+      .lang-selector { justify-content: center; }
+      h1 { justify-content: center; font-size: 1.6rem; }
+      .card { padding: 20px 14px; border-radius: 32px; }
+      .controls { flex-direction: column; }
+      .btn { width: 100%; }
+      .hold-btn { width: 160px; height: 160px; font-size: 0.95rem; }
+      .visual-output { font-size: 1.3rem; letter-spacing: 4px; }
+      .mouse-display { font-size: 1.5rem; }
+      .back-btn { position: static; display: inline-block; margin-bottom: 10px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="game-card">
+    <a href="../game_menu.html" class="back-btn" id="backBtn">← В меню</a>
+
+    <div class="header-row">
+        <h1 id="pageTitle">📡 Азбука Морзе <small id="pageSubtitle">· · − − ·</small></h1>
+        <div class="lang-selector">
+            <button class="lang-btn active" data-lang="ru">🇷🇺 RU</button>
+            <button class="lang-btn" data-lang="en">🇬🇧 EN</button>
+            <button class="lang-btn" data-lang="de">🇩🇪 DE</button>
+            <button class="lang-btn" data-lang="es">🇪🇸 ES</button>
+        </div>
+    </div>
+
+    <div class="tabs-nav">
+        <button class="tab-btn active" data-tab="tab-encode" id="tabBtn1">Текст → Морзе</button>
+        <button class="tab-btn" data-tab="tab-decode" id="tabBtn2">Морзе → Текст</button>
+        <button class="tab-btn" data-tab="tab-alphabet" id="tabBtn3">Алфавит</button>
+    </div>
+
+    <!-- Tab 1: Text to Morse -->
+    <div id="tab-encode" class="tab-content active">
+        <div class="card">
+            <h2 id="encodeTitle">Текст → Морзе</h2>
+
+            <div class="input-group">
+                <label id="textInputLabel" for="textInput">Введите текст:</label>
+                <textarea id="textInput" placeholder="Привет мир..."></textarea>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-primary" id="convertBtn">Преобразовать</button>
+                <button class="btn btn-secondary" id="clearBtn">Очистить</button>
+                <button class="btn btn-secondary" id="playBtn">🔊 Воспроизвести</button>
+            </div>
+
+            <div class="settings">
+                <div class="setting-item">
+                    <label id="speedLabel" for="speedSlider">Скорость: <span id="speedValue">150</span> мс</label>
+                    <input type="range" id="speedSlider" min="50" max="500" value="150">
+                </div>
+            </div>
+
+            <div class="input-group" style="margin-top: 20px;">
+                <label id="visualLabel">Визуальное представление:</label>
+                <div id="visualOutput" class="visual-output"></div>
+            </div>
+
+            <div class="input-group">
+                <label id="morseOutputLabel" for="morseOutput">Код Морзе:</label>
+                <textarea id="morseOutput" readonly placeholder="Здесь появится код Морзе..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 2: Morse to Text (Mouse Input) -->
+    <div id="tab-decode" class="tab-content">
+        <div class="card">
+            <h2 id="decodeTitle">Декодирование (мышью)</h2>
+
+            <div class="instructions" id="instructions">
+                <p><strong>Как пользоваться:</strong></p>
+                <p>• Короткое нажатие = точка (.)</p>
+                <p>• Долгое удержание = тире (−)</p>
+                <p>• Пауза между буквами: настраивается</p>
+                <p>• Пауза между словами: длиннее</p>
+            </div>
+
+            <div class="mouse-input-area">
+                <div class="hold-btn" id="morseHoldBtn">НАЖМИ И УДЕРЖИВАЙ</div>
+                <div id="mouseInputDisplay" class="mouse-display"></div>
+            </div>
+
+            <div class="settings">
+                <div class="setting-item">
+                    <label id="thresholdLabel" for="thresholdSlider">Порог точки/тире (мс): <span id="thresholdValue">300</span></label>
+                    <input type="range" id="thresholdSlider" min="100" max="1000" value="300">
+                </div>
+                <div class="setting-item">
+                    <label id="letterPauseLabel" for="letterPauseSlider">Пауза между буквами (мс): <span id="letterPauseValue">500</span></label>
+                    <input type="range" id="letterPauseSlider" min="200" max="2000" value="500">
+                </div>
+                <div class="setting-item">
+                    <label id="wordPauseLabel" for="wordPauseSlider">Пауза между словами (мс): <span id="wordPauseValue">1000</span></label>
+                    <input type="range" id="wordPauseSlider" min="500" max="3000" value="1000">
+                </div>
+            </div>
+
+            <div class="controls" style="margin-top: 20px;">
+                <button class="btn btn-primary" id="decodeBtn">Декодировать</button>
+                <button class="btn btn-secondary" id="clearInputBtn">Очистить ввод</button>
+            </div>
+
+            <div class="input-group">
+                <label id="decodedLabel">Расшифрованный текст:</label>
+                <div id="decodedOutput" class="decoded-output"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 3: Alphabet Reference -->
+    <div id="tab-alphabet" class="tab-content">
+        <div class="card">
+            <h2 id="alphabetTitle">Справочник алфавита</h2>
+            <div class="alphabet-grid">
+                <div class="alphabet-card">
+                    <h3 id="alphaEngTitle">🔤 Английский алфавит</h3>
+                    <p>A: .- &nbsp; B: -... &nbsp; C: -.-. &nbsp; D: -..</p>
+                    <p>E: . &nbsp; F: ..-. &nbsp; G: --. &nbsp; H: ....</p>
+                    <p>I: .. &nbsp; J: .--- &nbsp; K: -.- &nbsp; L: .-..</p>
+                    <p>M: -- &nbsp; N: -. &nbsp; O: --- &nbsp; P: .--.</p>
+                    <p>Q: --.- &nbsp; R: .-. &nbsp; S: ... &nbsp; T: -</p>
+                    <p>U: ..- &nbsp; V: ...- &nbsp; W: .-- &nbsp; X: -..-</p>
+                    <p>Y: -.-- &nbsp; Z: --..</p>
+                </div>
+                <div class="alphabet-card">
+                    <h3 id="alphaNumTitle">🔢 Цифры</h3>
+                    <p>0: ----- &nbsp; 1: .---- &nbsp; 2: ..---</p>
+                    <p>3: ...-- &nbsp; 4: ....- &nbsp; 5: .....</p>
+                    <p>6: -.... &nbsp; 7: --... &nbsp; 8: ---..</p>
+                    <p>9: ----.</p>
+                </div>
+                <div class="alphabet-card">
+                    <h3 id="alphaPuncTitle">❗ Пунктуация</h3>
+                    <p>.: .-.-.- &nbsp; ,: --..-- &nbsp; ?: ..--..</p>
+                    <p>!: -.-.-- &nbsp; /: -..-. &nbsp; @: .--.-.</p>
+                    <p>-: -....- &nbsp; (: -.--. &nbsp; ): -.--.-</p>
+                    <p>SOS: ...---...</p>
+                </div>
+                <div class="alphabet-card">
+                    <h3 id="alphaTipsTitle">💡 Подсказки</h3>
+                    <p id="tip1">• Точка (.) = короткий сигнал</p>
+                    <p id="tip2">• Тире (−) = длинный (3× точки)</p>
+                    <p id="tip3">• Пауза между буквами = 3 единицы</p>
+                    <p id="tip4">• Пауза между словами = 7 единиц</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="score-area">
+        <div class="score-badge" id="convertedLabel">📝 Преобразовано: <span id="convertedCount">0</span></div>
+        <div class="score-badge" id="decodedLabel2">📖 Декодировано: <span id="decodedCount">0</span></div>
+    </div>
+</div>
+
+<script>
+    // === ПЕРЕВОДЫ ===
+    const translations = {
+        ru: {
+            pageTitle: '📡 Азбука Морзе',
+            pageSubtitle: '· · − − ·',
+            backBtn: '← В меню',
+            tabBtn1: 'Текст → Морзе',
+            tabBtn2: 'Морзе → Текст',
+            tabBtn3: 'Алфавит',
+            encodeTitle: 'Текст → Морзе',
+            textInputLabel: 'Введите текст:',
+            textPlaceholder: 'Привет мир...',
+            convertBtn: 'Преобразовать',
+            clearBtn: 'Очистить',
+            playBtn: '🔊 Воспроизвести',
+            speedLabel: 'Скорость:',
+            speedUnit: 'мс',
+            visualLabel: 'Визуальное представление:',
+            morseOutputLabel: 'Код Морзе:',
+            morsePlaceholder: 'Здесь появится код Морзе...',
+            decodeTitle: 'Декодирование (мышью)',
+            instrTitle: 'Как пользоваться:',
+            instr1: '• Короткое нажатие = точка (.)',
+            instr2: '• Долгое удержание = тире (−)',
+            instr3: '• Пауза между буквами: настраивается',
+            instr4: '• Пауза между словами: длиннее',
+            holdBtn: 'НАЖМИ И УДЕРЖИВАЙ',
+            thresholdLabel: 'Порог точки/тире (мс):',
+            letterPauseLabel: 'Пауза между буквами (мс):',
+            wordPauseLabel: 'Пауза между словами (мс):',
+            decodeBtn: 'Декодировать',
+            clearInputBtn: 'Очистить ввод',
+            decodedLabel: 'Расшифрованный текст:',
+            alphabetTitle: 'Справочник алфавита',
+            alphaEngTitle: '🔤 Английский алфавит',
+            alphaNumTitle: '🔢 Цифры',
+            alphaPuncTitle: '❗ Пунктуация',
+            alphaTipsTitle: '💡 Подсказки',
+            tip1: '• Точка (.) = короткий сигнал',
+            tip2: '• Тире (−) = длинный (3× точки)',
+            tip3: '• Пауза между буквами = 3 единицы',
+            tip4: '• Пауза между словами = 7 единиц',
+            convertedLabel: '📝 Преобразовано:',
+            decodedLabel2: '📖 Декодировано:'
+        },
+        en: {
+            pageTitle: '📡 Morse Code',
+            pageSubtitle: '· · − − ·',
+            backBtn: '← Menu',
+            tabBtn1: 'Text → Morse',
+            tabBtn2: 'Morse → Text',
+            tabBtn3: 'Alphabet',
+            encodeTitle: 'Text → Morse',
+            textInputLabel: 'Enter text:',
+            textPlaceholder: 'Hello world...',
+            convertBtn: 'Convert',
+            clearBtn: 'Clear',
+            playBtn: '🔊 Play',
+            speedLabel: 'Speed:',
+            speedUnit: 'ms',
+            visualLabel: 'Visual representation:',
+            morseOutputLabel: 'Morse code:',
+            morsePlaceholder: 'Morse code will appear here...',
+            decodeTitle: 'Decoding (mouse input)',
+            instrTitle: 'How to use:',
+            instr1: '• Short press = dot (.)',
+            instr2: '• Long hold = dash (−)',
+            instr3: '• Pause between letters: adjustable',
+            instr4: '• Pause between words: longer',
+            holdBtn: 'CLICK AND HOLD',
+            thresholdLabel: 'Dot/dash threshold (ms):',
+            letterPauseLabel: 'Pause between letters (ms):',
+            wordPauseLabel: 'Pause between words (ms):',
+            decodeBtn: 'Decode',
+            clearInputBtn: 'Clear input',
+            decodedLabel: 'Decoded text:',
+            alphabetTitle: 'Alphabet reference',
+            alphaEngTitle: '🔤 English alphabet',
+            alphaNumTitle: '🔢 Numbers',
+            alphaPuncTitle: '❗ Punctuation',
+            alphaTipsTitle: '💡 Tips',
+            tip1: '• Dot (.) = short signal',
+            tip2: '• Dash (−) = long (3× dot)',
+            tip3: '• Pause between letters = 3 units',
+            tip4: '• Pause between words = 7 units',
+            convertedLabel: '📝 Converted:',
+            decodedLabel2: '📖 Decoded:'
+        },
+        de: {
+            pageTitle: '📡 Morsealphabet',
+            pageSubtitle: '· · − − ·',
+            backBtn: '← Menü',
+            tabBtn1: 'Text → Morse',
+            tabBtn2: 'Morse → Text',
+            tabBtn3: 'Alphabet',
+            encodeTitle: 'Text → Morse',
+            textInputLabel: 'Text eingeben:',
+            textPlaceholder: 'Hallo Welt...',
+            convertBtn: 'Umwandeln',
+            clearBtn: 'Löschen',
+            playBtn: '🔊 Abspielen',
+            speedLabel: 'Geschwindigkeit:',
+            speedUnit: 'ms',
+            visualLabel: 'Visuelle Darstellung:',
+            morseOutputLabel: 'Morsecode:',
+            morsePlaceholder: 'Morsecode erscheint hier...',
+            decodeTitle: 'Dekodierung (Mauseingabe)',
+            instrTitle: 'Bedienung:',
+            instr1: '• Kurzer Klick = Punkt (.)',
+            instr2: '• Langes Halten = Strich (−)',
+            instr3: '• Pause zwischen Buchstaben: einstellbar',
+            instr4: '• Pause zwischen Wörtern: länger',
+            holdBtn: 'KLICKEN UND HALTEN',
+            thresholdLabel: 'Punkt/Strich-Schwelle (ms):',
+            letterPauseLabel: 'Pause zwischen Buchstaben (ms):',
+            wordPauseLabel: 'Pause zwischen Wörtern (ms):',
+            decodeBtn: 'Dekodieren',
+            clearInputBtn: 'Eingabe löschen',
+            decodedLabel: 'Dekodierter Text:',
+            alphabetTitle: 'Alphabet-Referenz',
+            alphaEngTitle: '🔤 Englisches Alphabet',
+            alphaNumTitle: '🔢 Zahlen',
+            alphaPuncTitle: '❗ Satzzeichen',
+            alphaTipsTitle: '💡 Tipps',
+            tip1: '• Punkt (.) = kurzes Signal',
+            tip2: '• Strich (−) = lang (3× Punkt)',
+            tip3: '• Pause zwischen Buchstaben = 3 Einheiten',
+            tip4: '• Pause zwischen Wörtern = 7 Einheiten',
+            convertedLabel: '📝 Umgewandelt:',
+            decodedLabel2: '📖 Dekodiert:'
+        },
+        es: {
+            pageTitle: '📡 Código Morse',
+            pageSubtitle: '· · − − ·',
+            backBtn: '← Menú',
+            tabBtn1: 'Texto → Morse',
+            tabBtn2: 'Morse → Texto',
+            tabBtn3: 'Alfabeto',
+            encodeTitle: 'Texto → Morse',
+            textInputLabel: 'Ingrese texto:',
+            textPlaceholder: 'Hola mundo...',
+            convertBtn: 'Convertir',
+            clearBtn: 'Limpiar',
+            playBtn: '🔊 Reproducir',
+            speedLabel: 'Velocidad:',
+            speedUnit: 'ms',
+            visualLabel: 'Representación visual:',
+            morseOutputLabel: 'Código Morse:',
+            morsePlaceholder: 'El código Morse aparecerá aquí...',
+            decodeTitle: 'Decodificación (entrada del ratón)',
+            instrTitle: 'Cómo usar:',
+            instr1: '• Pulsación corta = punto (.)',
+            instr2: '• Pulsación larga = raya (−)',
+            instr3: '• Pausa entre letras: ajustable',
+            instr4: '• Pausa entre palabras: más larga',
+            holdBtn: 'CLIC Y MANTENER',
+            thresholdLabel: 'Umbral punto/raya (ms):',
+            letterPauseLabel: 'Pausa entre letras (ms):',
+            wordPauseLabel: 'Pausa entre palabras (ms):',
+            decodeBtn: 'Decodificar',
+            clearInputBtn: 'Limpiar entrada',
+            decodedLabel: 'Texto decodificado:',
+            alphabetTitle: 'Referencia del alfabeto',
+            alphaEngTitle: '🔤 Alfabeto inglés',
+            alphaNumTitle: '🔢 Números',
+            alphaPuncTitle: '❗ Puntuación',
+            alphaTipsTitle: '💡 Consejos',
+            tip1: '• Punto (.) = señal corta',
+            tip2: '• Raya (−) = larga (3× punto)',
+            tip3: '• Pausa entre letras = 3 unidades',
+            tip4: '• Pausa entre palabras = 7 unidades',
+            convertedLabel: '📝 Convertido:',
+            decodedLabel2: '📖 Decodificado:'
+        }
+    };
+
+    let currentLang = 'ru';
+    let convertedCount = 0;
+    let decodedCount = 0;
+
+    // === ПРИМЕНЕНИЕ ПЕРЕВОДА ===
+    function applyTranslation() {
+        const t = translations[currentLang];
+        document.getElementById('pageTitle').innerHTML = `${t.pageTitle} <small>${t.pageSubtitle}</small>`;
+        document.getElementById('backBtn').textContent = t.backBtn;
+        document.getElementById('tabBtn1').textContent = t.tabBtn1;
+        document.getElementById('tabBtn2').textContent = t.tabBtn2;
+        document.getElementById('tabBtn3').textContent = t.tabBtn3;
+        document.getElementById('encodeTitle').textContent = t.encodeTitle;
+        document.getElementById('textInputLabel').textContent = t.textInputLabel;
+        document.getElementById('textInput').placeholder = t.textPlaceholder;
+        document.getElementById('convertBtn').textContent = t.convertBtn;
+        document.getElementById('clearBtn').textContent = t.clearBtn;
+        document.getElementById('playBtn').textContent = t.playBtn;
+        const speedVal = document.getElementById('speedValue').textContent;
+        document.getElementById('speedLabel').innerHTML = `${t.speedLabel} <span id="speedValue">${speedVal}</span> ${t.speedUnit}`;
+        document.getElementById('visualLabel').textContent = t.visualLabel;
+        document.getElementById('morseOutputLabel').textContent = t.morseOutputLabel;
+        document.getElementById('morseOutput').placeholder = t.morsePlaceholder;
+        document.getElementById('decodeTitle').textContent = t.decodeTitle;
+        document.getElementById('instructions').innerHTML = `
+            <p><strong>${t.instrTitle}</strong></p>
+            <p>${t.instr1}</p>
+            <p>${t.instr2}</p>
+            <p>${t.instr3}</p>
+            <p>${t.instr4}</p>
+        `;
+        document.getElementById('morseHoldBtn').textContent = t.holdBtn;
+        const thVal = document.getElementById('thresholdValue').textContent;
+        document.getElementById('thresholdLabel').innerHTML = `${t.thresholdLabel} <span id="thresholdValue">${thVal}</span>`;
+        const lpVal = document.getElementById('letterPauseValue').textContent;
+        document.getElementById('letterPauseLabel').innerHTML = `${t.letterPauseLabel} <span id="letterPauseValue">${lpVal}</span>`;
+        const wpVal = document.getElementById('wordPauseValue').textContent;
+        document.getElementById('wordPauseLabel').innerHTML = `${t.wordPauseLabel} <span id="wordPauseValue">${wpVal}</span>`;
+        document.getElementById('decodeBtn').textContent = t.decodeBtn;
+        document.getElementById('clearInputBtn').textContent = t.clearInputBtn;
+        document.getElementById('decodedLabel').textContent = t.decodedLabel;
+        document.getElementById('alphabetTitle').textContent = t.alphabetTitle;
+        document.getElementById('alphaEngTitle').textContent = t.alphaEngTitle;
+        document.getElementById('alphaNumTitle').textContent = t.alphaNumTitle;
+        document.getElementById('alphaPuncTitle').textContent = t.alphaPuncTitle;
+        document.getElementById('alphaTipsTitle').textContent = t.alphaTipsTitle;
+        document.getElementById('tip1').textContent = t.tip1;
+        document.getElementById('tip2').textContent = t.tip2;
+        document.getElementById('tip3').textContent = t.tip3;
+        document.getElementById('tip4').textContent = t.tip4;
+        document.getElementById('convertedLabel').innerHTML = `${t.convertedLabel} <span id="convertedCount">${convertedCount}</span>`;
+        document.getElementById('decodedLabel2').innerHTML = `${t.decodedLabel2} <span id="decodedCount">${decodedCount}</span>`;
+        document.documentElement.lang = currentLang;
+        document.title = t.pageTitle + ' · Информатика';
+
+        document.querySelectorAll('.lang-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.lang === currentLang);
+        });
+    }
+
+    // === ПЕРЕКЛЮЧЕНИЕ ЯЗЫКА ===
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentLang = btn.dataset.lang;
+            applyTranslation();
+        });
+    });
+
+    // === ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ===
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(btn.dataset.tab).classList.add('active');
+        });
+    });
+
+    // === СЛОВАРЬ МОРЗЕ ===
+    const textToMorse = {
+        'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.',
+        'G': '--.', 'H': '....', 'I': '..', 'J': '.---', 'K': '-.-', 'L': '.-..',
+        'M': '--', 'N': '-.', 'O': '---', 'P': '.--.', 'Q': '--.-', 'R': '.-.',
+        'S': '...', 'T': '-', 'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-',
+        'Y': '-.--', 'Z': '--..',
+        '0': '-----', '1': '.----', '2': '..---', '3': '...--', '4': '....-',
+        '5': '.....', '6': '-....', '7': '--...', '8': '---..', '9': '----.',
+        '.': '.-.-.-', ',': '--..--', '?': '..--..', '!': '-.-.--', '/': '-..-.',
+        '(': '-.--.', ')': '-.--.-', '&': '.-...', ':': '---...', ';': '-.-.-.',
+        '=': '-...-', '+': '.-.-.', '-': '-....-', '_': '..--.-', '"': '.-..-.',
+        '$': '...-..-', '@': '.--.-.', ' ': '/'
+    };
+
+    const morseToText = {};
+    for (let key in textToMorse) {
+        morseToText[textToMorse[key]] = key;
+    }
+
+    // === ЭЛЕМЕНТЫ ===
+    const textInput = document.getElementById('textInput');
+    const morseOutput = document.getElementById('morseOutput');
+    const visualOutput = document.getElementById('visualOutput');
+    const convertBtn = document.getElementById('convertBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const playBtn = document.getElementById('playBtn');
+    const speedSlider = document.getElementById('speedSlider');
+
+    // === ПРЕОБРАЗОВАНИЕ ТЕКСТА В МОРЗЕ ===
+    function convertToMorse() {
+        const text = textInput.value.toUpperCase();
+        if (!text.trim()) return;
+        let morseCode = [];
+        let visualCode = [];
+
+        for (let char of text) {
+            if (textToMorse[char]) {
+                morseCode.push(textToMorse[char]);
+                visualCode.push(textToMorse[char]);
+            } else if (char === '\n') {
+                morseCode.push('/');
+                visualCode.push('/');
+            }
+        }
+
+        morseOutput.value = morseCode.join(' ');
+        visualOutput.textContent = visualCode.join(' ');
+        convertedCount++;
+        document.getElementById('convertedCount').textContent = convertedCount;
+    }
+
+    function clearFields() {
+        textInput.value = '';
+        morseOutput.value = '';
+        visualOutput.textContent = '';
+    }
+
+    // === ВОСПРОИЗВЕДЕНИЕ ЗВУКА ===
+    function playMorse() {
+        const morse = morseOutput.value;
+        if (!morse) return;
+
+        const speed = parseInt(speedSlider.value);
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let time = audioContext.currentTime;
+
+        for (let symbol of morse) {
+            if (symbol === '.') {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                osc.frequency.value = 600;
+                osc.type = 'sine';
+                gain.gain.setValueAtTime(0.3, time);
+                gain.gain.setValueAtTime(0, time + speed / 1000);
+                osc.start(time);
+                osc.stop(time + speed / 1000);
+                time += (speed * 2) / 1000;
+            } else if (symbol === '-') {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                osc.frequency.value = 600;
+                osc.type = 'sine';
+                gain.gain.setValueAtTime(0.3, time);
+                gain.gain.setValueAtTime(0, time + (speed * 3) / 1000);
+                osc.start(time);
+                osc.stop(time + (speed * 3) / 1000);
+                time += (speed * 4) / 1000;
+            } else if (symbol === ' ') {
+                time += (speed * 3) / 1000;
+            } else if (symbol === '/') {
+                time += (speed * 7) / 1000;
+            }
+        }
+    }
+
+    speedSlider.addEventListener('input', function() {
+        document.getElementById('speedValue').textContent = this.value;
+    });
+
+    convertBtn.addEventListener('click', convertToMorse);
+    clearBtn.addEventListener('click', clearFields);
+    playBtn.addEventListener('click', playMorse);
+
+    textInput.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.key === 'Enter') convertToMorse();
+    });
+
+    // === ВВОД МЫШЬЮ ===
+    const holdBtn = document.getElementById('morseHoldBtn');
+    const mouseInputDisplay = document.getElementById('mouseInputDisplay');
+    const thresholdSlider = document.getElementById('thresholdSlider');
+    const letterPauseSlider = document.getElementById('letterPauseSlider');
+    const wordPauseSlider = document.getElementById('wordPauseSlider');
+    const clearInputBtn = document.getElementById('clearInputBtn');
+    const decodeBtn = document.getElementById('decodeBtn');
+    const decodedOutput = document.getElementById('decodedOutput');
+
+    let pressStartTime = 0;
+    let lastReleaseTime = 0;
+    let currentInput = '';
+
+    function updateMouseDisplay() {
+        mouseInputDisplay.textContent = currentInput;
+    }
+
+    function handlePressStart(e) {
+        e.preventDefault();
+        const now = Date.now();
+
+        if (lastReleaseTime > 0) {
+            const elapsed = now - lastReleaseTime;
+            const wordPause = parseInt(wordPauseSlider.value);
+            const letterPause = parseInt(letterPauseSlider.value);
+
+            if (elapsed > wordPause) {
+                currentInput += '  ';
+            } else if (elapsed > letterPause) {
+                currentInput += ' ';
+            }
+        }
+
+        pressStartTime = now;
+        holdBtn.style.background = '#fad05a';
+        holdBtn.style.transform = 'translateY(6px)';
+        holdBtn.style.boxShadow = '0 4px 0 #9f7d2b, 0 8px 15px rgba(0, 0, 0, 0.4)';
+    }
+
+    function handlePressEnd(e) {
+        if (e) e.preventDefault();
+        if (pressStartTime === 0) return;
+
+        const now = Date.now();
+        const duration = now - pressStartTime;
+        const threshold = parseInt(thresholdSlider.value);
+
+        const symbol = duration < threshold ? '.' : '-';
+        currentInput += symbol;
+
+        updateMouseDisplay();
+        lastReleaseTime = now;
+        pressStartTime = 0;
+
+        holdBtn.style.background = '#f6c343';
+        holdBtn.style.transform = 'scale(1)';
+        holdBtn.style.boxShadow = '0 10px 0 #9f7d2b, 0 15px 30px rgba(0, 0, 0, 0.4)';
+    }
+
+    holdBtn.addEventListener('mousedown', handlePressStart);
+    holdBtn.addEventListener('mouseup', handlePressEnd);
+    holdBtn.addEventListener('mouseleave', (e) => {
+        if (pressStartTime > 0) handlePressEnd(e);
+    });
+    holdBtn.addEventListener('touchstart', handlePressStart, { passive: false });
+    holdBtn.addEventListener('touchend', handlePressEnd);
+
+    clearInputBtn.addEventListener('click', () => {
+        currentInput = '';
+        lastReleaseTime = 0;
+        updateMouseDisplay();
+        decodedOutput.textContent = '';
+    });
+
+    function decodeMorse() {
+        const input = currentInput.trim();
+        if (!input) {
+            decodedOutput.textContent = '';
+            return;
+        }
+
+        const words = input.split('  ');
+        const decodedWords = words.map(word => {
+            return word.split(' ').map(letter => {
+                return morseToText[letter] || '?';
+            }).join('');
+        });
+
+        decodedOutput.textContent = decodedWords.join(' ');
+        decodedCount++;
+        document.getElementById('decodedCount').textContent = decodedCount;
+    }
+
+    decodeBtn.addEventListener('click', decodeMorse);
+
+    thresholdSlider.addEventListener('input', function() {
+        document.getElementById('thresholdValue').textContent = this.value;
+    });
+    letterPauseSlider.addEventListener('input', function() {
+        document.getElementById('letterPauseValue').textContent = this.value;
+    });
+    wordPauseSlider.addEventListener('input', function() {
+        document.getElementById('wordPauseValue').textContent = this.value;
+    });
+
+    // === СТАРТ ===
+    applyTranslation();
+</script>
+
+</body>
+</html>

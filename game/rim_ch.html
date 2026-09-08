@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link rel="icon" type="image/png" href="../favicon.png"> 
+<title>Римская арифметика · Информатика</title>
+<style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: linear-gradient(145deg, #1a2634 0%, #0c141f 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      padding: 16px;
+      margin: 0;
+    }
+
+    .game-card {
+      max-width: 780px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 56px;
+      padding: 30px 26px 38px;
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.7), inset 0 1px 2px rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.02);
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .back-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: #2f4a62;
+      border: 1px solid #4d6b87;
+      padding: 8px 18px;
+      border-radius: 40px;
+      color: #eef4fc;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: 0.15s;
+      box-shadow: 0 5px 0 #152433;
+      z-index: 10;
+    }
+    .back-btn:hover {
+      background: #3d5a75;
+      transform: translateX(-3px);
+    }
+    .back-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #152433;
+    }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 6px;
+      padding-left: 110px;
+    }
+
+    h1 {
+      font-weight: 500;
+      font-size: 2rem;
+      letter-spacing: 1px;
+      color: #eef3fc;
+      text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    h1 small {
+      font-size: 1rem;
+      font-weight: 400;
+      opacity: 0.7;
+      background: #26384b;
+      padding: 4px 16px;
+      border-radius: 60px;
+      letter-spacing: 0.3px;
+    }
+
+    .lang-selector {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .lang-btn {
+      background: #26384b;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #b6cbe0;
+      cursor: pointer;
+      transition: 0.2s;
+      border: 1px solid #3d536b;
+      letter-spacing: 0.3px;
+    }
+    .lang-btn.active {
+      background: #f6c343;
+      color: #1a2634;
+      border-color: #fad67a;
+      box-shadow: 0 0 12px rgba(246, 195, 67, 0.3);
+    }
+    .lang-btn:hover {
+      background: #3d536b;
+      color: #f0f5ff;
+    }
+    .lang-btn.active:hover {
+      background: #fad05a;
+    }
+
+    .difficulty-panel {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin: 18px 0 24px;
+      flex-wrap: wrap;
+    }
+
+    .difficulty-btn {
+      background: #26384b;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #b6cbe0;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 6px 0 #0f1a26;
+      letter-spacing: 0.5px;
+      flex: 1 1 80px;
+      border: 1px solid #3d536b;
+    }
+    .difficulty-btn.active {
+      background: #f6c343;
+      color: #1a2634;
+      box-shadow: 0 6px 0 #a57d2a;
+      border-color: #fad67a;
+      transform: scale(1.02);
+    }
+    .difficulty-btn:hover {
+      background: #3d536b;
+      color: #f0f5ff;
+    }
+    .difficulty-btn.active:hover {
+      background: #fad05a;
+    }
+
+    .question-box {
+      background: #13202e;
+      border-radius: 48px;
+      padding: 28px 16px 24px;
+      margin: 10px 0 20px;
+      box-shadow: inset 0 8px 12px rgba(0,0,0,0.5), 0 4px 8px rgba(0,0,0,0.3);
+      border: 1px solid #314a60;
+    }
+
+    .question-text {
+      font-size: 2.6rem;
+      font-weight: 600;
+      text-align: center;
+      color: #f0f6ff;
+      letter-spacing: 1.5px;
+      word-break: break-word;
+      line-height: 1.4;
+      min-height: 5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px 12px;
+      flex-wrap: wrap;
+    }
+    .question-text .highlight {
+      background: #f6c343;
+      color: #0f1a26;
+      padding: 0 18px;
+      border-radius: 40px;
+      font-weight: 700;
+      box-shadow: 0 4px 0 #7f641f;
+      display: inline-block;
+      min-width: 60px;
+    }
+    .question-text .op-symbol {
+      color: #b6cbe0;
+      font-weight: 300;
+      margin: 0 4px;
+    }
+    .question-text .eq-symbol {
+      color: #b6cbe0;
+      font-weight: 300;
+    }
+
+    .input-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      margin-top: 10px;
+    }
+
+    .answer-input {
+      background: #0c1723;
+      border: 2px solid #2f4a62;
+      border-radius: 60px;
+      padding: 14px 24px;
+      font-size: 1.7rem;
+      width: 180px;
+      text-align: center;
+      color: #f0f6ff;
+      font-weight: 500;
+      outline: none;
+      transition: 0.2s;
+      box-shadow: inset 0 4px 6px rgba(0,0,0,0.6);
+    }
+    .answer-input:focus {
+      border-color: #f6c343;
+      background: #101f2e;
+      box-shadow: 0 0 0 3px rgba(246, 195, 67, 0.3);
+    }
+
+    .action-row {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 6px 0 4px;
+    }
+
+    .btn {
+      background: #2f4a62;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 1.2rem;
+      color: #eef4fc;
+      cursor: pointer;
+      transition: 0.15s;
+      box-shadow: 0 7px 0 #152433;
+      border: 1px solid #4d6b87;
+      flex: 1 1 120px;
+      letter-spacing: 0.5px;
+    }
+    .btn-primary {
+      background: #f6c343;
+      color: #1f2d3d;
+      box-shadow: 0 7px 0 #9f7d2b;
+      border-color: #fad87a;
+      font-weight: 700;
+    }
+    .btn-primary:hover {
+      background: #fdda5a;
+      transform: scale(1.02);
+    }
+    .btn-primary:active {
+      transform: translateY(4px);
+      box-shadow: 0 3px 0 #9f7d2b;
+    }
+    .btn-secondary {
+      background: #3c5772;
+      box-shadow: 0 7px 0 #1d3142;
+      border-color: #5a7a9a;
+    }
+    .btn-secondary:hover {
+      background: #4d6d8c;
+    }
+    .btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 3px 0 #152433;
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      transform: translateY(2px);
+      box-shadow: 0 3px 0 #152433;
+      pointer-events: none;
+    }
+
+    .feedback {
+      margin: 20px 0 10px;
+      font-size: 1.3rem;
+      font-weight: 500;
+      text-align: center;
+      min-height: 3.2rem;
+      color: #d3e2f5;
+      padding: 6px 12px;
+      border-radius: 40px;
+      background: #0d1a27;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .feedback .correct {
+      color: #a3e6b0;
+    }
+    .feedback .wrong {
+      color: #f7a7a7;
+    }
+
+    .score-area {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 18px;
+      padding: 8px 8px 0;
+      color: #b6cbe0;
+      font-weight: 400;
+      border-top: 1px solid #29415a;
+      padding-top: 18px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .score-badge {
+      background: #1b2d3f;
+      padding: 6px 18px;
+      border-radius: 40px;
+      font-size: 1.1rem;
+    }
+    .score-badge span {
+      font-weight: 700;
+      color: #f6c343;
+      margin: 0 4px;
+    }
+
+    .helper-hint {
+      color: #7f9bb8;
+      font-size: 0.9rem;
+      opacity: 0.8;
+      letter-spacing: 0.3px;
+    }
+
+    @media (max-width: 480px) {
+      .game-card { padding: 20px 14px; }
+      .question-text { font-size: 2.0rem; }
+      .answer-input { width: 150px; font-size: 1.4rem; }
+      .btn { padding: 12px 18px; font-size: 1rem; }
+      .header-row { flex-direction: column; align-items: stretch; padding-left: 0; padding-top: 50px; }
+      .lang-selector { justify-content: center; }
+      h1 { justify-content: center; font-size: 1.6rem; }
+      .back-btn { position: static; display: inline-block; margin-bottom: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="game-card">
+    <a href="../game_menu.html" class="back-btn" id="backBtn">← В меню</a>
+
+    <div class="header-row">
+      <h1 id="pageTitle">🏛️ Римская·Арифметика <small id="pageSubtitle">+, −, ×, ÷</small></h1>
+      <div class="lang-selector">
+        <button class="lang-btn active" data-lang="ru">🇷🇺 RU</button>
+        <button class="lang-btn" data-lang="en">🇬🇧 EN</button>
+        <button class="lang-btn" data-lang="es">🇪🇸 ES</button>
+        <button class="lang-btn" data-lang="de">🇩🇪 DE</button>
+      </div>
+    </div>
+
+    <div class="difficulty-panel">
+      <button class="difficulty-btn active" data-diff="easy">I · X</button>
+      <button class="difficulty-btn" data-diff="medium">X · C</button>
+      <button class="difficulty-btn" data-diff="hard">C · M</button>
+    </div>
+
+    <div class="question-box">
+      <div class="question-text" id="questionText">
+        <span>VIII</span>
+        <span class="op-symbol">+</span>
+        <span class="highlight">?</span>
+        <span class="eq-symbol">=</span>
+        <span>XII</span>
+      </div>
+      <div class="input-area">
+        <input type="text" class="answer-input" id="answerInput" placeholder="IV">
+        <div class="action-row">
+          <button class="btn btn-primary" id="checkBtn">Проверить</button>
+          <button class="btn btn-secondary" id="nextBtn">Следующий</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+
+    <div class="score-area">
+      <div class="score-badge" id="correctLabel">✅ Верно: <span id="correctCount">0</span></div>
+      <div class="score-badge" id="wrongLabel">❌ Ошибки: <span id="wrongCount">0</span></div>
+      <div class="score-badge" id="totalLabel">📊 Всего: <span id="totalCount">0</span></div>
+    </div>
+
+    <div class="helper-hint" id="helperHint">💡 Введите число или римскую цифру</div>
+</div>
+
+<script>
+    // === ПЕРЕВОДЫ ===
+    const translations = {
+        ru: {
+            pageTitle: '🏛️ Римская·Арифметика',
+            pageSubtitle: '+, −, ×, ÷',
+            checkBtn: 'Проверить',
+            nextBtn: 'Следующий',
+            backBtn: '← В меню',
+            correctMsg: '✅ Верно!',
+            wrongMsg: '❌ Правильно:',
+            correctLabel: '✅ Верно:',
+            wrongLabel: '❌ Ошибки:',
+            totalLabel: '📊 Всего:',
+            helperHint: '💡 Введите число или римскую цифру',
+            easy: 'I · X',
+            medium: 'X · C',
+            hard: 'C · M'
+        },
+        en: {
+            pageTitle: '🏛️ Roman·Arithmetic',
+            pageSubtitle: '+, −, ×, ÷',
+            checkBtn: 'Check',
+            nextBtn: 'Next',
+            backBtn: '← Menu',
+            correctMsg: '✅ Correct!',
+            wrongMsg: '❌ Correct:',
+            correctLabel: '✅ Correct:',
+            wrongLabel: '❌ Wrong:',
+            totalLabel: '📊 Total:',
+            helperHint: '💡 Enter a number or Roman numeral',
+            easy: 'I · X',
+            medium: 'X · C',
+            hard: 'C · M'
+        },
+        es: {
+            pageTitle: '🏛️ Aritmética·Romana',
+            pageSubtitle: '+, −, ×, ÷',
+            checkBtn: 'Comprobar',
+            nextBtn: 'Siguiente',
+            backBtn: '← Menú',
+            correctMsg: '✅ ¡Correcto!',
+            wrongMsg: '❌ Correcto:',
+            correctLabel: '✅ Correcto:',
+            wrongLabel: '❌ Errores:',
+            totalLabel: '📊 Total:',
+            helperHint: '💡 Ingresa un número o numeral romano',
+            easy: 'I · X',
+            medium: 'X · C',
+            hard: 'C · M'
+        },
+        de: {
+            pageTitle: '🏛️ Römische·Arithmetik',
+            pageSubtitle: '+, −, ×, ÷',
+            checkBtn: 'Prüfen',
+            nextBtn: 'Nächste',
+            backBtn: '← Menü',
+            correctMsg: '✅ Richtig!',
+            wrongMsg: '❌ Richtig:',
+            correctLabel: '✅ Richtig:',
+            wrongLabel: '❌ Falsch:',
+            totalLabel: '📊 Gesamt:',
+            helperHint: '💡 Gib eine Zahl oder römische Ziffer ein',
+            easy: 'I · X',
+            medium: 'X · C',
+            hard: 'C · M'
+        }
+    };
+
+    let currentLang = 'ru';
+
+    // === СОСТОЯНИЕ ИГРЫ ===
+    let correctCount = 0;
+    let wrongCount = 0;
+    let totalCount = 0;
+    let currentAnswer = '';
+    let currentDifficulty = 'easy';
+
+    // === РИМСКИЕ ЦИФРЫ ===
+    const romanNumerals = {
+        M: 1000, CM: 900, D: 500, CD: 400,
+        C: 100, XC: 90, L: 50, XL: 40,
+        X: 10, IX: 9, V: 5, IV: 4, I: 1
+    };
+
+    function toRoman(num) {
+        let result = '';
+        for (let [key, value] of Object.entries(romanNumerals)) {
+            while (num >= value) {
+                result += key;
+                num -= value;
+            }
+        }
+        return result;
+    }
+
+    function fromRoman(str) {
+        let result = 0;
+        for (let [key, value] of Object.entries(romanNumerals)) {
+            while (str.startsWith(key)) {
+                result += value;
+                str = str.slice(key.length);
+            }
+        }
+        return result;
+    }
+
+    // === ГЕНЕРАЦИЯ ВОПРОСА ===
+    function generateQuestion() {
+        const ranges = {
+            easy: [1, 10],
+            medium: [10, 100],
+            hard: [100, 1000]
+        };
+        const [min, max] = ranges[currentDifficulty];
+
+        const a = Math.floor(Math.random() * (max - min + 1)) + min;
+        const b = Math.floor(Math.random() * (max - min + 1)) + min;
+        const ops = ['+', '−', '×', '÷'];
+        const op = ops[Math.floor(Math.random() * ops.length)];
+
+        let answer;
+        switch(op) {
+            case '+': answer = a + b; break;
+            case '−': answer = Math.abs(a - b); break;
+            case '×': answer = a * b; break;
+            case '÷': answer = Math.floor(a / b); break;
+        }
+
+        currentAnswer = answer.toString();
+
+        const questionText = document.getElementById('questionText');
+        questionText.innerHTML = `
+            <span>${toRoman(a)}</span>
+            <span class="op-symbol">${op}</span>
+            <span class="highlight">?</span>
+            <span class="eq-symbol">=</span>
+            <span>${toRoman(op === '÷' ? a : (op === '−' ? Math.max(a, b) : a))}</span>
+        `;
+
+        document.getElementById('answerInput').value = '';
+        document.getElementById('feedback').textContent = '';
+        document.getElementById('answerInput').focus();
+    }
+
+    // === ПРОВЕРКА ОТВЕТА ===
+    function checkAnswer() {
+        const input = document.getElementById('answerInput').value.trim();
+        const feedback = document.getElementById('feedback');
+        const t = translations[currentLang];
+
+        let userAnswer;
+        if (/^\d+$/.test(input)) {
+            userAnswer = input;
+        } else if (/^[MDCLXVI]+$/.test(input.toUpperCase())) {
+            userAnswer = fromRoman(input.toUpperCase()).toString();
+        } else {
+            feedback.innerHTML = `<span class="wrong">❌ Неверный формат</span>`;
+            return;
+        }
+
+        totalCount++;
+        if (userAnswer === currentAnswer) {
+            correctCount++;
+            feedback.innerHTML = `<span class="correct">${t.correctMsg}</span>`;
+        } else {
+            wrongCount++;
+            feedback.innerHTML = `<span class="wrong">${t.wrongMsg} ${toRoman(parseInt(currentAnswer))}</span>`;
+        }
+
+        document.getElementById('correctCount').textContent = correctCount;
+        document.getElementById('wrongCount').textContent = wrongCount;
+        document.getElementById('totalCount').textContent = totalCount;
+    }
+
+    // === ПРИМЕНЕНИЕ ПЕРЕВОДА ===
+    function applyTranslation() {
+        const t = translations[currentLang];
+        document.getElementById('pageTitle').innerHTML = `${t.pageTitle} <small id="pageSubtitle">${t.pageSubtitle}</small>`;
+        document.getElementById('checkBtn').textContent = t.checkBtn;
+        document.getElementById('nextBtn').textContent = t.nextBtn;
+        document.getElementById('backBtn').textContent = t.backBtn;
+        document.getElementById('correctLabel').innerHTML = `${t.correctLabel} <span id="correctCount">${correctCount}</span>`;
+        document.getElementById('wrongLabel').innerHTML = `${t.wrongLabel} <span id="wrongCount">${wrongCount}</span>`;
+        document.getElementById('totalLabel').innerHTML = `${t.totalLabel} <span id="totalCount">${totalCount}</span>`;
+        document.getElementById('helperHint').textContent = t.helperHint;
+        document.documentElement.lang = currentLang;
+        document.title = t.pageTitle.replace('🏛️ ', '') + ' · Информатика';
+
+        document.querySelectorAll('.lang-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.lang === currentLang);
+        });
+
+        const feedback = document.getElementById('feedback');
+        if (feedback.dataset.state === 'correct') {
+            feedback.innerHTML = `<span class="correct">${t.correctMsg}</span>`;
+        } else if (feedback.dataset.state === 'wrong') {
+            feedback.innerHTML = `<span class="wrong">${t.wrongMsg} ${toRoman(parseInt(currentAnswer))}</span>`;
+        }
+    }
+
+    // === СОБЫТИЯ ===
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentLang = btn.dataset.lang;
+            applyTranslation();
+        });
+    });
+
+    document.querySelectorAll('.difficulty-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentDifficulty = btn.dataset.diff;
+            generateQuestion();
+        });
+    });
+
+    document.getElementById('checkBtn').onclick = checkAnswer;
+    document.getElementById('nextBtn').onclick = generateQuestion;
+    document.getElementById('answerInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') checkAnswer();
+    });
+
+    // === СТАРТ ===
+    applyTranslation();
+    generateQuestion();
+</script>
+
+</body>
+</html>

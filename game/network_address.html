@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link rel="icon" type="image/png" href="../favicon.png"> 
+<title>Адрес сети · Информатика</title>
+<style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: linear-gradient(145deg, #1a2634 0%, #0c141f 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      padding: 16px;
+      margin: 0;
+    }
+
+    .game-card {
+      max-width: 780px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 56px;
+      padding: 30px 26px 38px;
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.7), inset 0 1px 2px rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.02);
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .back-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: #2f4a62;
+      border: 1px solid #4d6b87;
+      padding: 8px 18px;
+      border-radius: 40px;
+      color: #eef4fc;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: 0.15s;
+      box-shadow: 0 5px 0 #152433;
+      z-index: 10;
+    }
+    .back-btn:hover {
+      background: #3d5a75;
+      transform: translateX(-3px);
+    }
+    .back-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #152433;
+    }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 6px;
+      padding-left: 110px;
+    }
+
+    h1 {
+      font-weight: 500;
+      font-size: 2rem;
+      letter-spacing: 1px;
+      color: #eef3fc;
+      text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    h1 small {
+      font-size: 1rem;
+      font-weight: 400;
+      opacity: 0.7;
+      background: #26384b;
+      padding: 4px 16px;
+      border-radius: 60px;
+      letter-spacing: 0.3px;
+    }
+
+    .lang-selector {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .lang-btn {
+      background: #26384b;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #b6cbe0;
+      cursor: pointer;
+      transition: 0.2s;
+      border: 1px solid #3d536b;
+      letter-spacing: 0.3px;
+    }
+    .lang-btn.active {
+      background: #f6c343;
+      color: #1a2634;
+      border-color: #fad67a;
+      box-shadow: 0 0 12px rgba(246, 195, 67, 0.3);
+    }
+    .lang-btn:hover {
+      background: #3d536b;
+      color: #f0f5ff;
+    }
+    .lang-btn.active:hover {
+      background: #fad05a;
+    }
+
+    .question-box {
+      background: #13202e;
+      border-radius: 48px;
+      padding: 28px 16px 24px;
+      margin: 20px 0;
+      box-shadow: inset 0 8px 12px rgba(0,0,0,0.5), 0 4px 8px rgba(0,0,0,0.3);
+      border: 1px solid #314a60;
+    }
+
+    .ip-block {
+      text-align: center;
+      margin: 15px 0;
+    }
+    .ip-label {
+      font-size: 0.9rem;
+      color: #7f9bb8;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 10px;
+      opacity: 0.8;
+    }
+    .ip-value {
+      font-size: 2.2rem;
+      font-weight: 600;
+      color: #f0f6ff;
+      letter-spacing: 1.5px;
+      font-family: 'Courier New', monospace;
+      background: #f6c343;
+      color: #0f1a26;
+      padding: 8px 24px;
+      border-radius: 40px;
+      font-weight: 700;
+      box-shadow: 0 4px 0 #7f641f;
+      display: inline-block;
+      min-width: 200px;
+    }
+
+    .answers-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 20px 0;
+    }
+
+    .answer-btn {
+      background: #2f4a62;
+      border: 1px solid #4d6b87;
+      padding: 18px;
+      border-radius: 40px;
+      font-size: 1.2rem;
+      font-family: 'Courier New', monospace;
+      font-weight: 600;
+      color: #eef4fc;
+      cursor: pointer;
+      transition: 0.15s;
+      box-shadow: 0 7px 0 #152433;
+      letter-spacing: 1px;
+    }
+    .answer-btn:hover:not(:disabled) {
+      background: #3d5a75;
+      transform: scale(1.02);
+    }
+    .answer-btn:active:not(:disabled) {
+      transform: translateY(4px);
+      box-shadow: 0 3px 0 #152433;
+    }
+    .answer-btn.correct {
+      background: #4a9d5f;
+      border-color: #6bc283;
+      box-shadow: 0 7px 0 #2d6b3f;
+      color: #fff;
+    }
+    .answer-btn.wrong {
+      background: #c24a4a;
+      border-color: #e06b6b;
+      box-shadow: 0 7px 0 #7f2d2d;
+      color: #fff;
+    }
+    .answer-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 6px 0 4px;
+    }
+
+    .btn {
+      background: #2f4a62;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 1.2rem;
+      color: #eef4fc;
+      cursor: pointer;
+      transition: 0.15s;
+      box-shadow: 0 7px 0 #152433;
+      border: 1px solid #4d6b87;
+      flex: 1 1 120px;
+      letter-spacing: 0.5px;
+    }
+    .btn-primary {
+      background: #f6c343;
+      color: #1f2d3d;
+      box-shadow: 0 7px 0 #9f7d2b;
+      border-color: #fad87a;
+      font-weight: 700;
+    }
+    .btn-primary:hover {
+      background: #fdda5a;
+      transform: scale(1.02);
+    }
+    .btn-primary:active {
+      transform: translateY(4px);
+      box-shadow: 0 3px 0 #9f7d2b;
+    }
+    .btn-secondary {
+      background: #3c5772;
+      box-shadow: 0 7px 0 #1d3142;
+      border-color: #5a7a9a;
+    }
+    .btn-secondary:hover {
+      background: #4d6d8c;
+    }
+    .btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 3px 0 #152433;
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      transform: translateY(2px);
+      box-shadow: 0 3px 0 #152433;
+      pointer-events: none;
+    }
+
+    .feedback {
+      margin: 20px 0 10px;
+      font-size: 1.3rem;
+      font-weight: 500;
+      text-align: center;
+      min-height: 3.2rem;
+      color: #d3e2f5;
+      padding: 6px 12px;
+      border-radius: 40px;
+      background: #0d1a27;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .feedback .correct {
+      color: #a3e6b0;
+    }
+    .feedback .wrong {
+      color: #f7a7a7;
+    }
+
+    .hint-box {
+      background: #1b2d3f;
+      border-left: 4px solid #f6c343;
+      padding: 14px 18px;
+      border-radius: 12px;
+      margin-top: 15px;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: #b6cbe0;
+      display: none;
+    }
+    .hint-box.show { display: block; }
+    .hint-box strong { color: #f6c343; }
+
+    .score-area {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 18px;
+      padding: 8px 8px 0;
+      color: #b6cbe0;
+      font-weight: 400;
+      border-top: 1px solid #29415a;
+      padding-top: 18px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .score-badge {
+      background: #1b2d3f;
+      padding: 6px 18px;
+      border-radius: 40px;
+      font-size: 1.1rem;
+    }
+    .score-badge span {
+      font-weight: 700;
+      color: #f6c343;
+      margin: 0 4px;
+    }
+
+    @media (max-width: 480px) {
+      .game-card { padding: 20px 14px; border-radius: 40px; }
+      .header-row { flex-direction: column; align-items: stretch; padding-left: 0; padding-top: 50px; }
+      .lang-selector { justify-content: center; }
+      h1 { justify-content: center; font-size: 1.6rem; }
+      .ip-value { font-size: 1.5rem; padding: 6px 16px; min-width: 160px; }
+      .answer-btn { font-size: 1rem; padding: 14px; }
+      .answers-grid { grid-template-columns: 1fr; }
+      .btn { padding: 12px 18px; font-size: 1rem; }
+      .back-btn { position: static; display: inline-block; margin-bottom: 10px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="game-card">
+    <a href="../game_menu.html" class="back-btn" id="backBtn">← В меню</a>
+
+    <div class="header-row">
+        <h1 id="pageTitle">🌐 Адрес сети <small id="pageSubtitle">IP AND маска</small></h1>
+        <div class="lang-selector">
+            <button class="lang-btn active" data-lang="ru">🇷🇺 RU</button>
+            <button class="lang-btn" data-lang="en">🇬🇧 EN</button>
+            <button class="lang-btn" data-lang="de">🇩🇪 DE</button>
+            <button class="lang-btn" data-lang="es">🇪🇸 ES</button>
+        </div>
+    </div>
+
+    <div class="question-box">
+        <div class="ip-block">
+            <div class="ip-label" id="ipLabel">IP-адрес узла</div>
+            <div class="ip-value" id="ipAddress">—</div>
+        </div>
+        <div class="ip-block">
+            <div class="ip-label" id="maskLabel">Маска подсети</div>
+            <div class="ip-value" id="subnetMask">—</div>
+        </div>
+    </div>
+
+    <div class="answers-grid" id="answersGrid"></div>
+
+    <div class="feedback" id="feedback"></div>
+
+    <div class="action-row">
+        <button class="btn btn-secondary" id="hintBtn">💡 Подсказка</button>
+        <button class="btn btn-primary" id="nextBtn" disabled>▶ Следующий</button>
+    </div>
+
+    <div class="hint-box" id="hintBox">
+        <strong id="hintTitle">💡 Как решить:</strong> <span id="hintText">Адрес сети = побитовое AND IP-адреса и маски. Для каждого октета: октет_сети = октет_ip AND октет_маски. Пример: 192.168.1.100 и маска 255.255.255.0 → сеть 192.168.1.0.</span>
+    </div>
+
+    <div class="score-area">
+        <div class="score-badge" id="correctLabel">✅ Верно: <span id="correctCount">0</span></div>
+        <div class="score-badge" id="wrongLabel">❌ Ошибки: <span id="wrongCount">0</span></div>
+        <div class="score-badge" id="totalLabel">📊 Всего: <span id="totalCount">0</span></div>
+    </div>
+</div>
+
+<script>
+    // === ПЕРЕВОДЫ ===
+    const translations = {
+        ru: {
+            pageTitle: '🌐 Адрес сети',
+            pageSubtitle: 'IP AND маска',
+            ipLabel: 'IP-адрес узла',
+            maskLabel: 'Маска подсети',
+            hintBtn: '💡 Подсказка',
+            nextBtn: '▶ Следующий',
+            backBtn: '← В меню',
+            correctMsg: '✅ Верно!',
+            wrongMsg: '❌ Правильно:',
+            correctLabel: '✅ Верно:',
+            wrongLabel: '❌ Ошибки:',
+            totalLabel: '📊 Всего:',
+            hintTitle: '💡 Как решить:',
+            hintText: 'Адрес сети = побитовое AND IP-адреса и маски. Для каждого октета: октет_сети = октет_ip AND октет_маски. Пример: 192.168.1.100 и маска 255.255.255.0 → сеть 192.168.1.0.'
+        },
+        en: {
+            pageTitle: '🌐 Network Address',
+            pageSubtitle: 'IP AND Mask',
+            ipLabel: 'Host IP address',
+            maskLabel: 'Subnet mask',
+            hintBtn: '💡 Hint',
+            nextBtn: '▶ Next',
+            backBtn: '← Menu',
+            correctMsg: '✅ Correct!',
+            wrongMsg: '❌ Correct answer:',
+            correctLabel: '✅ Correct:',
+            wrongLabel: '❌ Wrong:',
+            totalLabel: '📊 Total:',
+            hintTitle: '💡 How to solve:',
+            hintText: 'Network address = bitwise AND of IP and mask. For each octet: network_octet = ip_octet AND mask_octet. Example: 192.168.1.100 with mask 255.255.255.0 → network 192.168.1.0.'
+        },
+        de: {
+            pageTitle: '🌐 Netzwerkadresse',
+            pageSubtitle: 'IP UND Maske',
+            ipLabel: 'Host-IP-Adresse',
+            maskLabel: 'Subnetzmaske',
+            hintBtn: '💡 Hinweis',
+            nextBtn: '▶ Nächste',
+            backBtn: '← Menü',
+            correctMsg: '✅ Richtig!',
+            wrongMsg: '❌ Richtige Antwort:',
+            correctLabel: '✅ Richtig:',
+            wrongLabel: '❌ Falsch:',
+            totalLabel: '📊 Gesamt:',
+            hintTitle: '💡 So löst man es:',
+            hintText: 'Netzwerkadresse = bitweises UND von IP und Maske. Für jedes Oktett: Netzwerk_Oktett = IP_Oktett UND Masken_Oktett. Beispiel: 192.168.1.100 mit Maske 255.255.255.0 → Netzwerk 192.168.1.0.'
+        },
+        es: {
+            pageTitle: '🌐 Dirección de red',
+            pageSubtitle: 'IP AND máscara',
+            ipLabel: 'Dirección IP del host',
+            maskLabel: 'Máscara de subred',
+            hintBtn: '💡 Pista',
+            nextBtn: '▶ Siguiente',
+            backBtn: '← Menú',
+            correctMsg: '✅ ¡Correcto!',
+            wrongMsg: '❌ Respuesta correcta:',
+            correctLabel: '✅ Correcto:',
+            wrongLabel: '❌ Errores:',
+            totalLabel: '📊 Total:',
+            hintTitle: '💡 Cómo resolver:',
+            hintText: 'Dirección de red = AND bit a bit de IP y máscara. Para cada octeto: octeto_red = octeto_ip AND octeto_máscara. Ejemplo: 192.168.1.100 con máscara 255.255.255.0 → red 192.168.1.0.'
+        }
+    };
+
+    let currentLang = 'ru';
+
+    // === СОСТОЯНИЕ ИГРЫ ===
+    let correctCount = 0;
+    let wrongCount = 0;
+    let totalCount = 0;
+    let currentCorrectAnswer = '';
+    let answered = false;
+
+    // === МАСКИ ===
+    const MASKS = [
+        '255.0.0.0',
+        '255.255.0.0',
+        '255.255.255.0',
+        '255.255.255.128',
+        '255.255.255.192',
+        '255.255.255.224',
+        '255.255.255.240',
+        '255.255.255.248',
+        '255.255.255.252'
+    ];
+
+    // === ГЕНЕРАЦИЯ IP ===
+    function randomIP() {
+        const prefixes = [
+            [10, 0, 0], [10, 1, 1], [10, 10, 10],
+            [172, 16, 0], [172, 16, 1],
+            [192, 168, 0], [192, 168, 1], [192, 168, 100], [192, 168, 2],
+            [8, 8, 8], [77, 88, 8]
+        ];
+        const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+        const last = Math.floor(Math.random() * 254) + 1;
+        return `${prefix[0]}.${prefix[1]}.${prefix[2]}.${last}`;
+    }
+
+    function ipAND(ip1, ip2) {
+        const a = ip1.split('.').map(Number);
+        const b = ip2.split('.').map(Number);
+        return a.map((x, i) => x & b[i]).join('.');
+    }
+
+    function shuffle(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    function generateWrongAnswers(correctIP, ip, mask) {
+        const correctParts = correctIP.split('.').map(Number);
+        const ipParts = ip.split('.').map(Number);
+        const maskParts = mask.split('.').map(Number);
+        const wrongs = new Set();
+
+        wrongs.add(ip);
+
+        let wrong2 = ipParts.map((x, i) => x | maskParts[i]);
+        wrongs.add(wrong2.join('.'));
+
+        let wrong3 = ipParts.map((x, i) => x & (255 - maskParts[i]));
+        wrongs.add(wrong3.join('.'));
+
+        let wrong4 = [...correctParts];
+        const idx = Math.floor(Math.random() * 4);
+        wrong4[idx] = (wrong4[idx] + Math.floor(Math.random() * 50) + 1) % 256;
+        wrongs.add(wrong4.join('.'));
+
+        let wrong5 = [...correctParts];
+        wrong5[3] = (wrong5[3] + 1) % 256;
+        wrongs.add(wrong5.join('.'));
+
+        wrongs.delete(correctIP);
+        const result = Array.from(wrongs);
+        shuffle(result);
+        return result.slice(0, 3);
+    }
+
+    // === ПРИМЕНЕНИЕ ПЕРЕВОДА ===
+    function applyTranslation() {
+        const t = translations[currentLang];
+        document.getElementById('pageTitle').innerHTML = `${t.pageTitle} <small id="pageSubtitle">${t.pageSubtitle}</small>`;
+        document.getElementById('ipLabel').textContent = t.ipLabel;
+        document.getElementById('maskLabel').textContent = t.maskLabel;
+        document.getElementById('hintBtn').textContent = t.hintBtn;
+        document.getElementById('nextBtn').textContent = t.nextBtn;
+        document.getElementById('backBtn').textContent = t.backBtn;
+        document.getElementById('correctLabel').innerHTML = `${t.correctLabel} <span id="correctCount">${correctCount}</span>`;
+        document.getElementById('wrongLabel').innerHTML = `${t.wrongLabel} <span id="wrongCount">${wrongCount}</span>`;
+        document.getElementById('totalLabel').innerHTML = `${t.totalLabel} <span id="totalCount">${totalCount}</span>`;
+        document.getElementById('hintTitle').textContent = t.hintTitle;
+        document.getElementById('hintText').textContent = t.hintText;
+        document.documentElement.lang = currentLang;
+        document.title = t.pageTitle.replace('🌐 ', '') + ' · Информатика';
+
+        document.querySelectorAll('.lang-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.lang === currentLang);
+        });
+
+        const feedback = document.getElementById('feedback');
+        if (feedback.dataset.state === 'correct') {
+            feedback.innerHTML = `<span class="correct">${t.correctMsg}</span>`;
+        } else if (feedback.dataset.state === 'wrong') {
+            feedback.innerHTML = `<span class="wrong">${t.wrongMsg} ${currentCorrectAnswer}</span>`;
+        }
+    }
+
+    // === ПЕРЕКЛЮЧЕНИЕ ЯЗЫКА ===
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentLang = btn.dataset.lang;
+            applyTranslation();
+        });
+    });
+
+    // === ГЕНЕРАЦИЯ ВОПРОСА ===
+    function newQuestion() {
+        answered = false;
+        const feedback = document.getElementById('feedback');
+        feedback.textContent = '';
+        feedback.dataset.state = '';
+        document.getElementById('nextBtn').disabled = true;
+        document.getElementById('hintBox').classList.remove('show');
+
+        const ip = randomIP();
+        const mask = MASKS[Math.floor(Math.random() * MASKS.length)];
+        const correctAnswer = ipAND(ip, mask);
+        currentCorrectAnswer = correctAnswer;
+
+        document.getElementById('ipAddress').textContent = ip;
+        document.getElementById('subnetMask').textContent = mask;
+
+        const wrongs = generateWrongAnswers(correctAnswer, ip, mask);
+        const allAnswers = shuffle([correctAnswer, ...wrongs]);
+
+        const grid = document.getElementById('answersGrid');
+        grid.innerHTML = '';
+        allAnswers.forEach(ans => {
+            const btn = document.createElement('button');
+            btn.className = 'answer-btn';
+            btn.textContent = ans;
+            btn.onclick = () => checkAnswer(btn, ans);
+            grid.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(btn, answer) {
+        if (answered) return;
+        answered = true;
+        totalCount++;
+
+        const buttons = document.querySelectorAll('.answer-btn');
+        buttons.forEach(b => {
+            b.disabled = true;
+            if (b.textContent === currentCorrectAnswer) {
+                b.classList.add('correct');
+            }
+        });
+
+        const feedback = document.getElementById('feedback');
+        const t = translations[currentLang];
+
+        if (answer === currentCorrectAnswer) {
+            correctCount++;
+            feedback.innerHTML = `<span class="correct">${t.correctMsg}</span>`;
+            feedback.dataset.state = 'correct';
+        } else {
+            wrongCount++;
+            btn.classList.add('wrong');
+            feedback.innerHTML = `<span class="wrong">${t.wrongMsg} ${currentCorrectAnswer}</span>`;
+            feedback.dataset.state = 'wrong';
+        }
+
+        document.getElementById('correctCount').textContent = correctCount;
+        document.getElementById('wrongCount').textContent = wrongCount;
+        document.getElementById('totalCount').textContent = totalCount;
+        document.getElementById('nextBtn').disabled = false;
+    }
+
+    document.getElementById('nextBtn').onclick = newQuestion;
+    document.getElementById('hintBtn').onclick = () => {
+        document.getElementById('hintBox').classList.toggle('show');
+    };
+
+    // === СТАРТ ===
+    applyTranslation();
+    newQuestion();
+</script>
+
+</body>
+</html>
