@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Машина Тьюринга</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --panel-bg: #ffffff;
+            --primary: #2c3e50;
+            --accent: #e74c3c;
+            --highlight: #f1c40f;
+            --text: #333333;
+            --border: #dcdde1;
+            --cell-size: 36px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 { color: var(--primary); margin: 0 0 3px 0; font-size: 1.25rem; }
+        .subtitle { color: #7f8c8d; margin: 0 0 12px 0; text-align: center; font-size: 0.78rem; }
+
+        .container {
+            width: 100%;
+            max-width: 660px;
+            display: grid;
+            gap: 12px;
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            padding: 12px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
+
+        h2 { margin: 0 0 8px 0; font-size: 0.92rem; color: var(--primary); border-bottom: 2px solid var(--highlight); padding-bottom: 3px; }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .control-group { display: flex; flex-direction: column; gap: 2px; }
+        label { font-size: 0.72rem; font-weight: 600; color: #7f8c8d; }
+        
+        input[type="text"], select {
+            padding: 5px 8px;
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            font-size: 0.82rem;
+            outline: none;
+            font-family: 'Consolas', monospace;
+        }
+        input:focus, select:focus { border-color: var(--accent); }
+
+        .hint { font-size: 0.65rem; color: #95a5a6; }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 8px 0;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            max-height: 280px;
+        }
+
+        .transition-table {
+            border-collapse: collapse;
+            width: 100%;
+            min-width: 320px;
+        }
+
+        .transition-table th, .transition-table td {
+            border: 1px solid var(--border);
+            padding: 2px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .transition-table th {
+            background: #ecf0f1;
+            font-weight: 600;
+            padding: 5px 4px;
+            font-size: 0.82rem;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        .transition-table th.state-header {
+            background: #d5dbdb;
+            min-width: 48px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.78rem;
+        }
+
+        .transition-table th.symbol-header {
+            background: #d5dbdb;
+            min-width: 52px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.92rem;
+        }
+
+        /* Ячейка состояния с кнопкой удаления */
+        .transition-table td.state-cell {
+            background: #f8f9f9;
+            font-family: 'Consolas', monospace;
+            font-weight: bold;
+            font-size: 0.82rem;
+            position: relative;
+            padding-right: 22px !important;
+        }
+
+        .state-name {
+            display: inline-block;
+        }
+
+        .btn-delete-state {
+            position: absolute;
+            right: 3px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            border: none;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            font-size: 11px;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            opacity: 0.7;
+            transition: opacity 0.15s, transform 0.15s;
+        }
+
+        .btn-delete-state:hover {
+            opacity: 1;
+            transform: translateY(-50%) scale(1.15);
+        }
+
+        .btn-delete-state:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .transition-table td.rule-cell {
+            padding: 1px;
+            background: white;
+        }
+
+        .transition-table td.rule-cell.active-rule {
+            background: #fff3cd;
+            box-shadow: inset 0 0 0 2px var(--highlight);
+        }
+
+        .rule-input {
+            width: 100%;
+            padding: 3px 2px;
+            border: 1px solid transparent;
+            border-radius: 2px;
+            text-align: center;
+            font-family: 'Consolas', monospace;
+            font-size: 0.78rem;
+            background: transparent;
+            transition: all 0.2s;
+        }
+
+        .rule-input:hover { border-color: var(--border); background: #fafafa; }
+        .rule-input:focus { border-color: var(--accent); background: white; outline: none; }
+        .rule-input.error { border-color: var(--accent); background: #fdecea; }
+
+        .table-controls {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn-small {
+            padding: 4px 8px;
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+        }
+        .btn-small:hover { background: #ecf0f1; border-color: var(--primary); }
+
+        .btn-add-state { color: #2980b9; border-color: #2980b9; }
+        .btn-del-state { color: var(--accent); border-color: var(--accent); }
+        .btn-add-symbol { color: #27ae60; border-color: #27ae60; }
+        .btn-del-symbol { color: #8e44ad; border-color: #8e44ad; }
+        .btn-apply { background: var(--accent); color: white; border-color: var(--accent); font-weight: bold; }
+        .btn-apply:hover { background: #c0392b; }
+
+        .tape-viewport {
+            overflow-x: auto;
+            background: #ecf0f1;
+            padding: 25px 0 20px 0;
+            border-radius: 4px;
+        }
+
+        .tape {
+            display: flex;
+            width: max-content;
+            margin: 0 auto;
+        }
+
+        .cell {
+            width: var(--cell-size);
+            height: var(--cell-size);
+            border: 1px solid #bdc3c7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            font-weight: bold;
+            background: white;
+            position: relative;
+            box-sizing: border-box;
+            font-family: 'Consolas', monospace;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s;
+            user-select: none;
+        }
+
+        .cell:hover:not(.active) {
+            background: #eaf4fb;
+            border-color: #3498db;
+            transform: scale(1.05);
+        }
+
+        .cell.active {
+            background: var(--highlight);
+            border-color: #f39c12;
+            z-index: 2;
+            box-shadow: 0 0 8px rgba(241, 196, 15, 0.6);
+            cursor: default;
+        }
+
+        .cell.active::after {
+            content: '▼';
+            position: absolute;
+            bottom: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--accent);
+            font-size: 1rem;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-3px); }
+        }
+
+        .tape-hint {
+            font-size: 0.7rem;
+            color: #7f8c8d;
+            margin-top: 6px;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .status-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .status-box {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: var(--primary);
+            color: white;
+            border-radius: 5px;
+            padding: 6px 10px;
+        }
+
+        .status-item { display: flex; flex-direction: column; align-items: center; }
+        .status-label { font-size: 0.65rem; opacity: 0.8; }
+        .status-value { font-size: 0.95rem; font-weight: bold; color: var(--highlight); font-family: 'Consolas', monospace; }
+
+        .controls-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .btn-group { display: flex; gap: 8px; }
+
+        button.main-btn {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        button.main-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        button.main-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .btn-step { background: #3498db; color: white; }
+        .btn-run { background: #2ecc71; color: white; }
+        .btn-reset { background: #95a5a6; color: white; }
+
+        .examples {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed var(--border);
+        }
+        .examples strong { font-size: 0.75rem; }
+        .example-btn {
+            margin: 2px;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            background: #ecf0f1;
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .example-btn:hover { background: #d5dbdb; }
+
+        @media (max-width: 700px) {
+            .settings-grid { grid-template-columns: 1fr; }
+            .status-row { flex-direction: column; align-items: stretch; }
+            .status-box { width: 100%; justify-content: space-around; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🧠 Машина Тьюринга</h1>
+    <p class="subtitle">Редактор таблицы переходов • Клик по ленте — перемещение головки</p>
+
+    <div class="container">
+
+        <div class="panel">
+            <h2>⚙️ Параметры машины</h2>
+            <div class="settings-grid">
+                <div class="control-group">
+                    <label>Алфавит (через запятую):</label>
+                    <input type="text" id="alphabet" value="λ, 0, 1">
+                    <span class="hint">λ или _ — пустой символ</span>
+                </div>
+                <div class="control-group">
+                    <label>Начальная лента:</label>
+                    <input type="text" id="tape-input" value="0110">
+                    <span class="hint">пробел = λ</span>
+                </div>
+                <div class="control-group">
+                    <label>Начальное состояние:</label>
+                    <input type="text" id="start-state" value="q0">
+                </div>
+                <div class="control-group">
+                    <label>Состояние остановки:</label>
+                    <input type="text" id="halt-state" value="qH">
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>📋 Таблица переходов</h2>
+            <p style="font-size:0.75rem; color:#7f8c8d; margin:0 0 6px 0;">
+                Формат: <b>символ, направление, состояние</b> (напр. <code>λ, L, q1</code>). Направления: <b>L</b> — влево, <b>R</b> — вправо, <b>S</b> — остаться.
+            </p>
+            
+            <div class="table-controls" style="margin-bottom: 6px;">
+                <button class="btn-small btn-add-state" id="btn-add-state">+ Сост.</button>
+                <button class="btn-small btn-del-state" id="btn-del-state">− Сост.</button>
+                <button class="btn-small btn-add-symbol" id="btn-add-symbol">+ Символ</button>
+                <button class="btn-small btn-del-symbol" id="btn-del-symbol">− Символ</button>
+                <button class="btn-small btn-apply" id="btn-apply">✓ Применить</button>
+                <button class="btn-small" id="btn-load-example">📥 Пример</button>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="transition-table" id="transition-table"></table>
+            </div>
+
+            <div class="examples">
+                <strong>Примеры:</strong><br>
+                <button class="example-btn" data-example="from_image">С картинки</button>
+                <button class="example-btn" data-example="unary_add">Сложение</button>
+                <button class="example-btn" data-example="increment">Инкремент</button>
+                <button class="example-btn" data-example="invert">Инверсия</button>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>📼 Лента машины</h2>
+            <div class="tape-viewport" id="viewport">
+                <div class="tape" id="tape"></div>
+            </div>
+            <div class="tape-hint">💡 Кликните по ячейке — головка (▼) переместится туда. Машина ставится на паузу.</div>
+        </div>
+
+        <div class="panel">
+            <div class="status-row">
+                <div class="control-group">
+                    <label>Скорость: <span id="speed-val">5</span></label>
+                    <input type="range" id="speed" min="1" max="10" value="5" style="width:110px;">
+                </div>
+                <div class="status-box">
+                    <div class="status-item">
+                        <span class="status-label">Сост.</span>
+                        <span class="status-value" id="current-state">—</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Символ</span>
+                        <span class="status-value" id="current-symbol">—</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Шаг</span>
+                        <span class="status-value" id="step-count">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel controls-panel">
+            <div class="btn-group">
+                <button id="btn-step" class="main-btn btn-step">Шаг ▶</button>
+                <button id="btn-run" class="main-btn btn-run">Старт ⏵</button>
+                <button id="btn-reset" class="main-btn btn-reset">Сброс ↺</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const examples = {
+            from_image: {
+                alphabet: ['λ', '0', '1'],
+                startState: 'q0',
+                haltState: 'qH',
+                initialTape: '01',
+                states: ['q0', 'q1'],
+                rules: {
+                    'q0,λ': { write: 'λ', move: 'L', next: 'q1' },
+                    'q1,λ': { write: 'λ', move: 'S', next: 'q1' },
+                    'q1,1': { write: '1', move: 'L', next: 'q1' },
+                    'q1,0': { write: '0', move: 'S', next: 'q1' }
+                }
+            },
+            unary_add: {
+                alphabet: ['λ', '1', '+'],
+                startState: 'q0',
+                haltState: 'qH',
+                initialTape: '111+11',
+                states: ['q0', 'q1'],
+                rules: {
+                    'q0,1': { write: '1', move: 'R', next: 'q0' },
+                    'q0,+': { write: '1', move: 'L', next: 'q1' },
+                    'q1,1': { write: '1', move: 'L', next: 'q1' },
+                    'q1,λ': { write: 'λ', move: 'R', next: 'qH' }
+                }
+            },
+            increment: {
+                alphabet: ['λ', '0', '1'],
+                startState: 'q0',
+                haltState: 'qH',
+                initialTape: '1011',
+                states: ['q0', 'q1'],
+                rules: {
+                    'q0,0': { write: '0', move: 'R', next: 'q0' },
+                    'q0,1': { write: '1', move: 'R', next: 'q0' },
+                    'q0,λ': { write: 'λ', move: 'L', next: 'q1' },
+                    'q1,0': { write: '1', move: 'S', next: 'qH' },
+                    'q1,1': { write: '0', move: 'L', next: 'q1' },
+                    'q1,λ': { write: '1', move: 'S', next: 'qH' }
+                }
+            },
+            invert: {
+                alphabet: ['λ', '0', '1'],
+                startState: 'q0',
+                haltState: 'qH',
+                initialTape: '101001',
+                states: ['q0', 'q1'],
+                rules: {
+                    'q0,0': { write: '1', move: 'R', next: 'q0' },
+                    'q0,1': { write: '0', move: 'R', next: 'q0' },
+                    'q0,λ': { write: 'λ', move: 'L', next: 'q1' },
+                    'q1,0': { write: '0', move: 'L', next: 'q1' },
+                    'q1,1': { write: '1', move: 'L', next: 'q1' },
+                    'q1,λ': { write: 'λ', move: 'R', next: 'qH' }
+                }
+            }
+        };
+
+        let appState = {
+            alphabet: ['λ', '0', '1'],
+            states: ['q0', 'q1'],
+            startState: 'q0',
+            haltState: 'qH',
+            rules: {},
+            tape: [],
+            head: 0,
+            state: 'q0',
+            isHalted: false,
+            error: false,
+            stepCount: 0
+        };
+
+        let isRunning = false;
+        let runTimeout = null;
+
+        const $ = id => document.getElementById(id);
+        const alphabetInput = $('alphabet');
+        const startStateInput = $('start-state');
+        const haltStateInput = $('halt-state');
+        const tapeInput = $('tape-input');
+        const transitionTable = $('transition-table');
+        const tapeEl = $('tape');
+        const viewportEl = $('viewport');
+        const stateEl = $('current-state');
+        const symbolEl = $('current-symbol');
+        const stepCountEl = $('step-count');
+        const speedSlider = $('speed');
+        const speedVal = $('speed-val');
+        const btnStep = $('btn-step');
+        const btnRun = $('btn-run');
+        const btnReset = $('btn-reset');
+        const btnApply = $('btn-apply');
+        const btnAddState = $('btn-add-state');
+        const btnDelState = $('btn-del-state');
+        const btnAddSymbol = $('btn-add-symbol');
+        const btnDelSymbol = $('btn-del-symbol');
+
+        // ============================================================
+        //  УДАЛЕНИЕ СОСТОЯНИЯ
+        // ============================================================
+        function deleteState(stateName) {
+            if (appState.states.length <= 1) {
+                alert('⚠️ Нельзя удалить единственное состояние!');
+                return;
+            }
+
+            const warnings = [];
+            if (stateName === appState.startState) {
+                warnings.push(`«${stateName}» — начальное состояние`);
+            }
+            if (stateName === appState.haltState) {
+                warnings.push(`«${stateName}» — состояние остановки`);
+            }
+
+            let msg = `Удалить состояние «${stateName}»?\n\nТакже будут удалены все правила, связанные с ним.`;
+            if (warnings.length > 0) {
+                msg += `\n\n⚠️ Внимание: ${warnings.join(', ')}.`;
+            }
+
+            if (!confirm(msg)) return;
+
+            // Удаляем состояние из списка
+            appState.states = appState.states.filter(s => s !== stateName);
+
+            // Удаляем все правила, где это состояние — ключ (строка таблицы)
+            Object.keys(appState.rules).forEach(key => {
+                if (key.startsWith(`${stateName},`)) {
+                    delete appState.rules[key];
+                }
+            });
+
+            // Удаляем все правила, где это состояние — next (целевое)
+            Object.keys(appState.rules).forEach(key => {
+                if (appState.rules[key].next === stateName) {
+                    delete appState.rules[key];
+                }
+            });
+
+            // Если удалили начальное — берём первое оставшееся
+            if (stateName === appState.startState) {
+                appState.startState = appState.states[0];
+                startStateInput.value = appState.startState;
+            }
+
+            renderTable();
+        }
+
+        // ============================================================
+        //  УДАЛЕНИЕ СИМВОЛА
+        // ============================================================
+        function deleteSymbol(symName) {
+            if (appState.alphabet.length <= 1) {
+                alert('⚠️ Нельзя удалить единственный символ!');
+                return;
+            }
+
+            if (!confirm(`Удалить символ «${symName}» из алфавита?\nВсе правила с этим символом будут удалены.`)) return;
+
+            appState.alphabet = appState.alphabet.filter(s => s !== symName);
+
+            Object.keys(appState.rules).forEach(key => {
+                if (key.endsWith(`,${symName}`)) {
+                    delete appState.rules[key];
+                }
+            });
+
+            renderTable();
+        }
+
+        // ============================================================
+        //  РЕНДЕР ТАБЛИЦЫ (с кнопками удаления)
+        // ============================================================
+        function renderTable() {
+            transitionTable.innerHTML = '';
+            const thead = document.createElement('tr');
+            thead.innerHTML = '<th class="state-header">сост\\симв</th>';
+            appState.alphabet.forEach(sym => {
+                const th = document.createElement('th');
+                th.className = 'symbol-header';
+                th.textContent = sym === 'λ' || sym === '_' ? 'λ' : sym;
+                thead.appendChild(th);
+            });
+            transitionTable.appendChild(thead);
+
+            appState.states.forEach(state => {
+                const tr = document.createElement('tr');
+                const stateTd = document.createElement('td');
+                stateTd.className = 'state-cell';
+
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'state-name';
+                nameSpan.textContent = state;
+                stateTd.appendChild(nameSpan);
+
+                // Кнопка удаления состояния
+                const delBtn = document.createElement('button');
+                delBtn.className = 'btn-delete-state';
+                delBtn.textContent = '×';
+                delBtn.title = `Удалить состояние ${state}`;
+                // Блокируем, если состояние единственное
+                delBtn.disabled = appState.states.length <= 1;
+                delBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteState(state);
+                });
+                stateTd.appendChild(delBtn);
+
+                tr.appendChild(stateTd);
+
+                appState.alphabet.forEach(sym => {
+                    const td = document.createElement('td');
+                    td.className = 'rule-cell';
+                    const key = `${state},${sym}`;
+                    const rule = appState.rules[key];
+                    const input = document.createElement('input');
+                    input.className = 'rule-input';
+                    input.type = 'text';
+                    input.dataset.state = state;
+                    input.dataset.symbol = sym;
+                    input.value = rule ? `${rule.write}, ${rule.move}, ${rule.next}` : '';
+                    input.placeholder = '—';
+                    input.addEventListener('blur', () => validateRuleInput(input));
+                    input.addEventListener('keydown', e => { if (e.key === 'Enter') input.blur(); });
+                    td.appendChild(input);
+                    tr.appendChild(td);
+                });
+                transitionTable.appendChild(tr);
+            });
+        }
+
+        function validateRuleInput(input) {
+            const val = input.value.trim();
+            if (val === '') { input.classList.remove('error'); return true; }
+            const parts = val.split(',').map(s => s.trim());
+            if (parts.length !== 3 || !['L','R','S'].includes(parts[1].toUpperCase())) {
+                input.classList.add('error'); return false;
+            }
+            input.classList.remove('error'); return true;
+        }
+
+        function parseTableToRules() {
+            const inputs = transitionTable.querySelectorAll('.rule-input');
+            const rules = {};
+            let hasError = false;
+            inputs.forEach(input => {
+                const val = input.value.trim();
+                if (val === '') return;
+                const parts = val.split(',').map(s => s.trim());
+                if (parts.length !== 3 || !['L','R','S'].includes(parts[1].toUpperCase())) {
+                    input.classList.add('error'); hasError = true; return;
+                }
+                const key = `${input.dataset.state},${input.dataset.symbol}`;
+                rules[key] = { write: parts[0], move: parts[1].toUpperCase(), next: parts[2] };
+            });
+            if (hasError) {
+                alert('️ Ошибки в таблице (выделены красным).\nФормат: символ, направление(L/R/S), состояние');
+                return null;
+            }
+            return rules;
+        }
+
+        function applyTable() {
+            const rules = parseTableToRules();
+            if (!rules) return;
+            appState.rules = rules;
+            appState.startState = startStateInput.value.trim() || 'q0';
+            appState.haltState = haltStateInput.value.trim() || 'qH';
+            const alphaStr = alphabetInput.value;
+            appState.alphabet = alphaStr.split(',').map(s => s.trim()).filter(s => s !== '').map(s => s === '_' ? 'λ' : s);
+            resetMachine();
+            alert('✅ Таблица применена!');
+        }
+
+        function initTape(inputStr) {
+            const padding = 8;
+            const normalized = inputStr.split('').map(c => c === ' ' ? 'λ' : (c === '_' ? 'λ' : c));
+            appState.tape = Array(padding).fill('λ').concat(normalized).concat(Array(padding).fill('λ'));
+            appState.head = padding;
+        }
+
+        function resetMachine() {
+            pauseRun();
+            initTape(tapeInput.value);
+            appState.state = appState.startState;
+            appState.isHalted = false;
+            appState.error = false;
+            appState.stepCount = 0;
+            renderAll();
+        }
+
+        function stepMachine() {
+            if (appState.isHalted) return false;
+            const symbol = appState.tape[appState.head];
+            const ruleKey = `${appState.state},${symbol}`;
+            const rule = appState.rules[ruleKey];
+            if (!rule) { appState.isHalted = true; appState.error = true; return false; }
+
+            appState.tape[appState.head] = rule.write;
+            if (rule.move === 'L') appState.head--;
+            else if (rule.move === 'R') appState.head++;
+
+            if (appState.head < 0) { appState.tape.unshift('λ'); appState.head = 0; }
+            else if (appState.head >= appState.tape.length) { appState.tape.push('λ'); }
+
+            appState.state = rule.next;
+            appState.stepCount++;
+            if (appState.state === appState.haltState) appState.isHalted = true;
+            return true;
+        }
+
+        function handleTapeClick(e) {
+            const cell = e.target.closest('.cell');
+            if (!cell) return;
+            const idx = Array.from(tapeEl.children).indexOf(cell);
+            if (idx < 0) return;
+
+            if (isRunning) pauseRun();
+            appState.head = idx;
+            if (appState.isHalted) {
+                appState.isHalted = false;
+                appState.error = false;
+            }
+            renderAll();
+        }
+
+        function renderAll() {
+            renderTape();
+            renderStatus();
+            highlightActiveRule();
+            updateButtons();
+        }
+
+        function renderTape() {
+            tapeEl.innerHTML = '';
+            appState.tape.forEach((sym, idx) => {
+                const cell = document.createElement('div');
+                cell.className = 'cell' + (idx === appState.head ? ' active' : '');
+                cell.textContent = sym === 'λ' ? 'λ' : sym;
+                cell.dataset.index = idx;
+                cell.addEventListener('click', handleTapeClick);
+                tapeEl.appendChild(cell);
+            });
+            const activeCell = tapeEl.querySelector('.active');
+            if (activeCell) {
+                activeCell.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function renderStatus() {
+            if (appState.isHalted && appState.error) {
+                stateEl.textContent = "НЕТ ПРАВИЛА"; stateEl.style.color = "#e74c3c";
+            } else if (appState.isHalted) {
+                stateEl.textContent = "СТОП"; stateEl.style.color = "#2ecc71";
+            } else {
+                stateEl.textContent = appState.state; stateEl.style.color = "#f1c40f";
+            }
+            const sym = appState.tape[appState.head];
+            symbolEl.textContent = sym === 'λ' ? 'λ' : sym;
+            symbolEl.style.color = "#f1c40f";
+            stepCountEl.textContent = appState.stepCount;
+        }
+
+        function highlightActiveRule() {
+            document.querySelectorAll('.rule-cell').forEach(td => td.classList.remove('active-rule'));
+            if (appState.isHalted) return;
+            const sym = appState.tape[appState.head];
+            const input = transitionTable.querySelector(`.rule-input[data-state="${appState.state}"][data-symbol="${sym}"]`);
+            if (input) input.closest('td').classList.add('active-rule');
+        }
+
+        function updateButtons() {
+            btnStep.disabled = appState.isHalted || isRunning;
+            btnRun.disabled = appState.isHalted;
+            btnRun.textContent = isRunning ? 'Пауза ⏸' : 'Старт ⏵';
+            btnRun.className = 'main-btn ' + (isRunning ? 'btn-step' : 'btn-run');
+        }
+
+        function doStep() { stepMachine(); renderAll(); }
+        function toggleRun() { if (isRunning) pauseRun(); else startRun(); }
+        function startRun() {
+            if (appState.isHalted) return;
+            isRunning = true; updateButtons(); runLoop();
+        }
+        function runLoop() {
+            if (!isRunning || appState.isHalted) { pauseRun(); return; }
+            doStep();
+            const delay = 1100 - (speedSlider.value * 100);
+            runTimeout = setTimeout(runLoop, delay);
+        }
+        function pauseRun() { isRunning = false; clearTimeout(runTimeout); updateButtons(); }
+
+        function loadExample(key) {
+            const ex = examples[key]; if (!ex) return;
+            pauseRun();
+            appState.alphabet = [...ex.alphabet];
+            appState.states = [...ex.states];
+            appState.startState = ex.startState;
+            appState.haltState = ex.haltState;
+            appState.rules = JSON.parse(JSON.stringify(ex.rules));
+            alphabetInput.value = ex.alphabet.join(', ');
+            startStateInput.value = ex.startState;
+            haltStateInput.value = ex.haltState;
+            tapeInput.value = ex.initialTape;
+            renderTable();
+            resetMachine();
+        }
+
+        // ============================================================
+        //  ОБРАБОТЧИКИ
+        // ============================================================
+        btnApply.addEventListener('click', applyTable);
+
+        btnAddState.addEventListener('click', () => {
+            const name = prompt('Имя нового состояния:', `q${appState.states.length}`);
+            if (name && name.trim() && !appState.states.includes(name.trim())) {
+                appState.states.push(name.trim()); renderTable();
+            }
+        });
+
+        // Удаление состояния через панель управления (альтернативный способ)
+        btnDelState.addEventListener('click', () => {
+            if (appState.states.length <= 1) {
+                alert('⚠️ Нельзя удалить единственное состояние!');
+                return;
+            }
+            const list = appState.states.join(', ');
+            const name = prompt(`Какое состояние удалить?\nДоступны: ${list}`);
+            if (name && name.trim() && appState.states.includes(name.trim())) {
+                deleteState(name.trim());
+            } else if (name && name.trim()) {
+                alert(`Состояние «${name.trim()}» не найдено.`);
+            }
+        });
+
+        btnAddSymbol.addEventListener('click', () => {
+            const sym = prompt('Новый символ алфавита:', '2');
+            if (sym && sym.trim() && !appState.alphabet.includes(sym.trim())) {
+                appState.alphabet.push(sym.trim()); renderTable();
+            }
+        });
+
+        btnDelSymbol.addEventListener('click', () => {
+            if (appState.alphabet.length <= 1) {
+                alert('⚠️ Нельзя удалить единственный символ!');
+                return;
+            }
+            const list = appState.alphabet.join(', ');
+            const sym = prompt(`Какой символ удалить?\nДоступны: ${list}`);
+            if (sym && sym.trim() && appState.alphabet.includes(sym.trim())) {
+                deleteSymbol(sym.trim());
+            } else if (sym && sym.trim()) {
+                alert(`Символ «${sym.trim()}» не найден.`);
+            }
+        });
+
+        $('btn-load-example').addEventListener('click', () => loadExample('from_image'));
+        document.querySelectorAll('.example-btn').forEach(btn => {
+            btn.addEventListener('click', () => loadExample(btn.dataset.example));
+        });
+        btnStep.addEventListener('click', doStep);
+        btnRun.addEventListener('click', toggleRun);
+        btnReset.addEventListener('click', resetMachine);
+        speedSlider.addEventListener('input', () => { speedVal.textContent = speedSlider.value; });
+
+        loadExample('from_image');
+    </script>
+</body>
+</html>
