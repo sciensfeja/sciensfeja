@@ -23,23 +23,6 @@
             line-height: 1.6;
         }
 
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        .modal-overlay.hidden {
-            display: none;
-        }
-
         .cheat-sheet {
             background: white;
             border-radius: 16px;
@@ -333,11 +316,6 @@
                 padding: 0;
             }
 
-            .modal-overlay {
-                position: static;
-                background: none;
-            }
-
             .cheat-sheet {
                 box-shadow: none;
                 max-height: none;
@@ -355,140 +333,113 @@
     </style>
 </head>
 <body>
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="cheat-sheet">
-            <div class="header">
-                <button class="close-btn" id="closeBtnTop" title="Закрыть">×</button>
-                <h1>📚 Памятка учителя информатики</h1>
-                <p>Быстрые подсказки для эффективного преподавания</p>
+    <div class="cheat-sheet">
+        <div class="header">
+            <!-- Кнопка закрытия с функцией возврата -->
+            <button class="close-btn" onclick="goHome()" title="Вернуться на главную">×</button>
+            <h1>📚 Памятка учителя информатики</h1>
+            <p>Быстрые подсказки для эффективного преподавания</p>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2><span class="icon">🚀</span> Экспресс-диагностика</h2>
+                <p>Когда ученик говорит «У меня не работает», задайте эти 3 вопроса:</p>
+                <ol>
+                    <li><strong>Текст ошибки:</strong> «Что именно написано в консоли/терминале?» (Читай последнюю строку!)</li>
+                    <li><strong>Окружение:</strong> «Ты сохранил файл перед запуском?», «Тот ли файл ты запустил?»</li>
+                    <li><strong>Изоляция:</strong> «Работал ли этот код 5 минут назад? Что ты изменил с тех пор?»</li>
+                </ol>
             </div>
 
-            <div class="content">
-                <div class="section">
-                    <h2><span class="icon">🚀</span> Экспресс-диагностика</h2>
-                    <p>Когда ученик говорит «У меня не работает», задайте эти 3 вопроса:</p>
-                    <ol>
-                        <li><strong>Текст ошибки:</strong> «Что именно написано в консоли/терминале?» (Читай последнюю строку!)</li>
-                        <li><strong>Окружение:</strong> «Ты сохранил файл перед запуском?», «Тот ли файл ты запустил?»</li>
-                        <li><strong>Изоляция:</strong> «Работал ли этот код 5 минут назад? Что ты изменил с тех пор?»</li>
-                    </ol>
-                </div>
+            <div class="section">
+                <h2><span class="icon">⌨️</span> Топ-5 горячих клавиш</h2>
+                <p>Для VS Code / PyCharm:</p>
+                <ul>
+                    <li><span class="keyboard-shortcut">Ctrl + /</span> Закомментировать / раскомментировать строку</li>
+                    <li><span class="keyboard-shortcut">Alt + ↑ / ↓</span> Переместить строку кода вверх/вниз</li>
+                    <li><span class="keyboard-shortcut">Ctrl + D</span> Выделить следующее вхождение (мультикурсор)</li>
+                    <li><span class="keyboard-shortcut">Ctrl + Shift + K</span> Удалить всю строку</li>
+                    <li><span class="keyboard-shortcut">Ctrl + P</span> Быстрый переход к файлу по имени</li>
+                </ul>
+            </div>
 
-                <div class="section">
-                    <h2><span class="icon">⌨️</span> Топ-5 горячих клавиш</h2>
-                    <p>Для VS Code / PyCharm:</p>
-                    <ul>
-                        <li><span class="keyboard-shortcut">Ctrl + /</span> Закомментировать / раскомментировать строку</li>
-                        <li><span class="keyboard-shortcut">Alt + ↑ / ↓</span> Переместить строку кода вверх/вниз</li>
-                        <li><span class="keyboard-shortcut">Ctrl + D</span> Выделить следующее вхождение (мультикурсор)</li>
-                        <li><span class="keyboard-shortcut">Ctrl + Shift + K</span> Удалить всю строку</li>
-                        <li><span class="keyboard-shortcut">Ctrl + P</span> Быстрый переход к файлу по имени</li>
-                    </ul>
+            <div class="section">
+                <h2><span class="icon">🌐</span> Мини-глоссарий</h2>
+                <div class="glossary-item">
+                    <span class="term">Debugging</span>
+                    <span class="definition">Отладка (поиск и исправление ошибок)</span>
                 </div>
-
-                <div class="section">
-                    <h2><span class="icon">🌐</span> Мини-глоссарий</h2>
-                    <div class="glossary-item">
-                        <span class="term">Debugging</span>
-                        <span class="definition">Отладка (поиск и исправление ошибок)</span>
-                    </div>
-                    <div class="glossary-item">
-                        <span class="term">Framework</span>
-                        <span class="definition">Каркас / библиотека для упрощения разработки</span>
-                    </div>
-                    <div class="glossary-item">
-                        <span class="term">Deployment</span>
-                        <span class="definition">Развертывание (выкладка проекта на сервер)</span>
-                    </div>
-                    <div class="glossary-item">
-                        <span class="term">Variable scope</span>
-                        <span class="definition">Область видимости переменной</span>
-                    </div>
-                    <div class="glossary-item">
-                        <span class="term">Recursive</span>
-                        <span class="definition">Рекурсивный (вызывающий сам себя)</span>
-                    </div>
-                    <div class="glossary-item">
-                        <span class="term">Legacy code</span>
-                        <span class="definition">Устаревший, но работающий код</span>
-                    </div>
+                <div class="glossary-item">
+                    <span class="term">Framework</span>
+                    <span class="definition">Каркас / библиотека для упрощения разработки</span>
                 </div>
-
-                <div class="section">
-                    <h2><span class="icon">🤖</span> Чек-лист перед сдачей проекта</h2>
-                    <ul class="checklist">
-                        <li>
-                            <input type="checkbox" id="check1">
-                            <label for="check1">Код отформатирован (PEP 8 для Python или Prettier для JS)</label>
-                        </li>
-                        <li>
-                            <input type="checkbox" id="check2">
-                            <label for="check2">Есть комментарии к сложным участкам</label>
-                        </li>
-                        <li>
-                            <input type="checkbox" id="check3">
-                            <label for="check3">Переменные названы осмысленно (не a, b, x1)</label>
-                        </li>
-                        <li>
-                            <input type="checkbox" id="check4">
-                            <label for="check4">Программа не падает при вводе некорректных данных</label>
-                        </li>
-                    </ul>
+                <div class="glossary-item">
+                    <span class="term">Deployment</span>
+                    <span class="definition">Развертывание (выкладка проекта на сервер)</span>
                 </div>
-
-                <div class="section">
-                    <h2><span class="icon">💡</span> Мотивационная цитата</h2>
-                    <div class="quote">
-                        <div class="en">"The best way to predict the future is to invent it."</div>
-                        <div class="ru">«Лучший способ предсказать будущее — изобрести его»</div>
-                        <div class="author">— Alan Kay</div>
-                    </div>
+                <div class="glossary-item">
+                    <span class="term">Variable scope</span>
+                    <span class="definition">Область видимости переменной</span>
+                </div>
+                <div class="glossary-item">
+                    <span class="term">Recursive</span>
+                    <span class="definition">Рекурсивный (вызывающий сам себя)</span>
+                </div>
+                <div class="glossary-item">
+                    <span class="term">Legacy code</span>
+                    <span class="definition">Устаревший, но работающий код</span>
                 </div>
             </div>
 
-            <div class="footer">
-                <button class="btn btn-print" id="printBtn">
-                    <span>🖨️</span> Печать
-                </button>
-                <button class="btn btn-close" id="closeBtnBottom">
-                    <span>❌</span> Закрыть
-                </button>
+            <div class="section">
+                <h2><span class="icon">🤖</span> Чек-лист перед сдачей проекта</h2>
+                <ul class="checklist">
+                    <li>
+                        <input type="checkbox" id="check1">
+                        <label for="check1">Код отформатирован (PEP 8 для Python или Prettier для JS)</label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="check2">
+                        <label for="check2">Есть комментарии к сложным участкам</label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="check3">
+                        <label for="check3">Переменные названы осмысленно (не a, b, x1)</label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="check4">
+                        <label for="check4">Программа не падает при вводе некорректных данных</label>
+                    </li>
+                </ul>
             </div>
+
+            <div class="section">
+                <h2><span class="icon">💡</span> Мотивационная цитата</h2>
+                <div class="quote">
+                    <div class="en">"The best way to predict the future is to invent it."</div>
+                    <div class="ru">«Лучший способ предсказать будущее — изобрести его»</div>
+                    <div class="author">— Alan Kay</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <button class="btn btn-print" onclick="window.print()">
+                <span>🖨️</span> Печать
+            </button>
+            <!-- Кнопка закрытия внизу также ведет на главную -->
+            <button class="btn btn-close" onclick="goHome()">
+                <span>❌</span> Закрыть
+            </button>
         </div>
     </div>
 
     <script>
-        // Закрытие модального окна
-        const modalOverlay = document.getElementById('modalOverlay');
-        const closeBtnTop = document.getElementById('closeBtnTop');
-        const closeBtnBottom = document.getElementById('closeBtnBottom');
-        const printBtn = document.getElementById('printBtn');
-
-        function closeModal() {
-            modalOverlay.classList.add('hidden');
+        // Функция перехода на главную страницу
+        function goHome() {
+            window.location.href = '../index.html';
         }
-
-        closeBtnTop.addEventListener('click', closeModal);
-        closeBtnBottom.addEventListener('click', closeModal);
-
-        // Закрытие по клику на оверлей
-        modalOverlay.addEventListener('click', (e) => {
-            if (e.target === modalOverlay) {
-                closeModal();
-            }
-        });
-
-        // Закрытие по Escape
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !modalOverlay.classList.contains('hidden')) {
-                closeModal();
-            }
-        });
-
-        // Печать
-        printBtn.addEventListener('click', () => {
-            window.print();
-        });
 
         // Сохранение состояния чек-листа в localStorage
         const checkboxes = document.querySelectorAll('.checklist input[type="checkbox"]');
