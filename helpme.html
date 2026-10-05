@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Памятка учителя информатики</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #FCE4EC 0%, #F8BBD0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #424242;
+            line-height: 1.6;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.hidden {
+            display: none;
+        }
+
+        .cheat-sheet {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(126, 87, 194, 0.3);
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #7E57C2 0%, #9C27B0 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 16px 16px 0 0;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #FAFAFA;
+            border-radius: 12px;
+            border-left: 4px solid #7E57C2;
+        }
+
+        .section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section h2 {
+            color: #7E57C2;
+            font-size: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h2 .icon {
+            font-size: 24px;
+        }
+
+        .section p {
+            margin-bottom: 12px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .section ol, .section ul {
+            margin-left: 20px;
+            margin-bottom: 12px;
+        }
+
+        .section li {
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .section li strong {
+            color: #7E57C2;
+        }
+
+        .keyboard-shortcut {
+            display: inline-block;
+            background: #F3E5F5;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #7E57C2;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .glossary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #E1BEE7;
+        }
+
+        .glossary-item:last-child {
+            border-bottom: none;
+        }
+
+        .glossary-item .term {
+            font-weight: 600;
+            color: #7E57C2;
+        }
+
+        .glossary-item .definition {
+            color: #666;
+            text-align: right;
+        }
+
+        .checklist {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .checklist li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .checklist input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #7E57C2;
+        }
+
+        .checklist label {
+            cursor: pointer;
+            flex: 1;
+            font-size: 14px;
+        }
+
+        .checklist input[type="checkbox"]:checked + label {
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        .quote {
+            background: linear-gradient(135deg, #F3E5F5 0%, #E1BEE7 100%);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-style: italic;
+            color: #424242;
+        }
+
+        .quote .en {
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #7E57C2;
+        }
+
+        .quote .ru {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .quote .author {
+            margin-top: 12px;
+            font-weight: 600;
+            color: #7E57C2;
+            font-style: normal;
+        }
+
+        .footer {
+            padding: 20px 30px;
+            background: #FAFAFA;
+            border-top: 1px solid #E1BEE7;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-print {
+            background: #7E57C2;
+            color: white;
+        }
+
+        .btn-print:hover {
+            background: #6A3FB5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(126, 87, 194, 0.4);
+        }
+
+        .btn-close {
+            background: #E1BEE7;
+            color: #7E57C2;
+        }
+
+        .btn-close:hover {
+            background: #CE93D8;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .cheat-sheet {
+                max-height: 95vh;
+                border-radius: 12px;
+            }
+
+            .header {
+                padding: 20px;
+                border-radius: 12px 12px 0 0;
+            }
+
+            .header h1 {
+                font-size: 22px;
+                padding-right: 50px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .section {
+                padding: 15px;
+            }
+
+            .section h2 {
+                font-size: 18px;
+            }
+
+            .glossary-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .glossary-item .definition {
+                text-align: left;
+            }
+
+            .footer {
+                flex-direction: column;
+                padding: 15px 20px;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .modal-overlay {
+                position: static;
+                background: none;
+            }
+
+            .cheat-sheet {
+                box-shadow: none;
+                max-height: none;
+                page-break-inside: avoid;
+            }
+
+            .close-btn, .footer {
+                display: none;
+            }
+
+            .section {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="cheat-sheet">
+            <div class="header">
+                <button class="close-btn" id="closeBtnTop" title="Закрыть">×</button>
+                <h1>📚 Памятка учителя информатики</h1>
+                <p>Быстрые подсказки для эффективного преподавания</p>
+            </div>
+
+            <div class="content">
+                <div class="section">
+                    <h2><span class="icon">🚀</span> Экспресс-диагностика</h2>
+                    <p>Когда ученик говорит «У меня не работает», задайте эти 3 вопроса:</p>
+                    <ol>
+                        <li><strong>Текст ошибки:</strong> «Что именно написано в консоли/терминале?» (Читай последнюю строку!)</li>
+                        <li><strong>Окружение:</strong> «Ты сохранил файл перед запуском?», «Тот ли файл ты запустил?»</li>
+                        <li><strong>Изоляция:</strong> «Работал ли этот код 5 минут назад? Что ты изменил с тех пор?»</li>
+                    </ol>
+                </div>
+
+                <div class="section">
+                    <h2><span class="icon">⌨️</span> Топ-5 горячих клавиш</h2>
+                    <p>Для VS Code / PyCharm:</p>
+                    <ul>
+                        <li><span class="keyboard-shortcut">Ctrl + /</span> Закомментировать / раскомментировать строку</li>
+                        <li><span class="keyboard-shortcut">Alt + ↑ / ↓</span> Переместить строку кода вверх/вниз</li>
+                        <li><span class="keyboard-shortcut">Ctrl + D</span> Выделить следующее вхождение (мультикурсор)</li>
+                        <li><span class="keyboard-shortcut">Ctrl + Shift + K</span> Удалить всю строку</li>
+                        <li><span class="keyboard-shortcut">Ctrl + P</span> Быстрый переход к файлу по имени</li>
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h2><span class="icon">🌐</span> Мини-глоссарий</h2>
+                    <div class="glossary-item">
+                        <span class="term">Debugging</span>
+                        <span class="definition">Отладка (поиск и исправление ошибок)</span>
+                    </div>
+                    <div class="glossary-item">
+                        <span class="term">Framework</span>
+                        <span class="definition">Каркас / библиотека для упрощения разработки</span>
+                    </div>
+                    <div class="glossary-item">
+                        <span class="term">Deployment</span>
+                        <span class="definition">Развертывание (выкладка проекта на сервер)</span>
+                    </div>
+                    <div class="glossary-item">
+                        <span class="term">Variable scope</span>
+                        <span class="definition">Область видимости переменной</span>
+                    </div>
+                    <div class="glossary-item">
+                        <span class="term">Recursive</span>
+                        <span class="definition">Рекурсивный (вызывающий сам себя)</span>
+                    </div>
+                    <div class="glossary-item">
+                        <span class="term">Legacy code</span>
+                        <span class="definition">Устаревший, но работающий код</span>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2><span class="icon">🤖</span> Чек-лист перед сдачей проекта</h2>
+                    <ul class="checklist">
+                        <li>
+                            <input type="checkbox" id="check1">
+                            <label for="check1">Код отформатирован (PEP 8 для Python или Prettier для JS)</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="check2">
+                            <label for="check2">Есть комментарии к сложным участкам</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="check3">
+                            <label for="check3">Переменные названы осмысленно (не a, b, x1)</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="check4">
+                            <label for="check4">Программа не падает при вводе некорректных данных</label>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h2><span class="icon">💡</span> Мотивационная цитата</h2>
+                    <div class="quote">
+                        <div class="en">"The best way to predict the future is to invent it."</div>
+                        <div class="ru">«Лучший способ предсказать будущее — изобрести его»</div>
+                        <div class="author">— Alan Kay</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer">
+                <button class="btn btn-print" id="printBtn">
+                    <span>🖨️</span> Печать
+                </button>
+                <button class="btn btn-close" id="closeBtnBottom">
+                    <span>❌</span> Закрыть
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Закрытие модального окна
+        const modalOverlay = document.getElementById('modalOverlay');
+        const closeBtnTop = document.getElementById('closeBtnTop');
+        const closeBtnBottom = document.getElementById('closeBtnBottom');
+        const printBtn = document.getElementById('printBtn');
+
+        function closeModal() {
+            modalOverlay.classList.add('hidden');
+        }
+
+        closeBtnTop.addEventListener('click', closeModal);
+        closeBtnBottom.addEventListener('click', closeModal);
+
+        // Закрытие по клику на оверлей
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                closeModal();
+            }
+        });
+
+        // Закрытие по Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modalOverlay.classList.contains('hidden')) {
+                closeModal();
+            }
+        });
+
+        // Печать
+        printBtn.addEventListener('click', () => {
+            window.print();
+        });
+
+        // Сохранение состояния чек-листа в localStorage
+        const checkboxes = document.querySelectorAll('.checklist input[type="checkbox"]');
+        
+        checkboxes.forEach((checkbox, index) => {
+            const savedState = localStorage.getItem(`checklist_${index}`);
+            if (savedState === 'true') {
+                checkbox.checked = true;
+            }
+
+            checkbox.addEventListener('change', () => {
+                localStorage.setItem(`checklist_${index}`, checkbox.checked);
+            });
+        });
+    </script>
+</body>
+</html>
