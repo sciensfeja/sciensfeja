@@ -380,6 +380,7 @@ section {
 .card-course { --primary-color: var(--purple); }
 .card-trainers { --primary-color: var(--cyan); }
 .card-help { --primary-color: var(--green); }
+.card-ai { --primary-color: var(--aqua); }
 
 .featured {
     background: linear-gradient(135deg, rgba(196, 77, 255, 0.2), rgba(77, 121, 255, 0.2));
